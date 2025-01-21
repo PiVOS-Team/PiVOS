@@ -1,0 +1,18 @@
+[constants]
+arch = 'aarch64-linux-gnu'
+
+[binaries]
+c = arch + '-gcc'
+ar = arch + '-ar'
+strip = arch + '-strip'
+objdump = arch + '-objdump'
+objcopy = arch + '-objcopy'
+gdb = arch + '-gdb'
+qemu = 'qemu-system-aarch64'
+
+[host_machine]
+system = 'none'
+kernel = 'none'
+cpu = 'armv8-a'
+cpu_family = 'aarch64'
+endian = 'little'

@@ -1,0 +1,11 @@
+option('board', type : 'combo', choices : [
+        'raspi4b',
+    ],
+    value : 'raspi4b'
+)
+option('cpu_model', type : 'combo', choices : [
+        'cortex-a72'
+    ],
+    value : 'cortex-a72'
+)
+option('entry_offset', type : 'integer', min : 0, value : 0x80000)

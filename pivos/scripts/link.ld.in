@@ -1,0 +1,25 @@
+ENTRY(start)
+SECTIONS
+{
+    . = $ENTRY_OFFSET;
+
+    .text : {
+        *(.boot)
+        *(.text)
+    }
+
+    .rodata : {
+        *(.rodata)
+    }
+
+    . = ALIGN(16);
+    .data : {
+        *(.data)
+    }
+
+    .bss : {
+        bss_start = .;
+        *(.bss)
+        bss_end = .;
+    }
+}

@@ -1,0 +1,57 @@
+#ifndef KERNEL_LOG_H_
+#define KERNEL_LOG_H_
+
+// TODO?: Xmacros
+
+enum kstatus_origin {
+    KSTATUS_ORIGIN_DEV,
+    KSTATUS_ORIGIN_INT,
+    KSTATUS_ORIGIN_UTILS,
+    KSTATUS_ORIGIN_DEV_GENERIC,
+    KSTATUS_ORIGIN_DEV_IO,
+    KSTATUS_ORIGIN_DEV_GIC,
+    KSTATUS_ORIGIN_DEV_TIMER,
+};
+
+enum kstatus_dev {
+    KSTATUS_DEV_OK,
+    KSTATUS_DEV_ERR = KSTATUS_ORIGIN_DEV << 16 | 1 << 31,
+    KSTATUS_DEV_INVALID,
+    KSTATUS_DEV_ALREADY_EXISTS,
+    KSTATUS_DEV_OUT_OF_BOUNDS,
+};
+
+enum kstatus_int {
+    KSTATUS_INT_OK,
+    KSTATUS_INT_ERR = KSTATUS_ORIGIN_INT << 16 | 1 << 31,
+};
+
+enum kstatus_utils {
+    KSTATUS_UTILS_OK,
+    KSTATUS_UTILS_ERR = KSTATUS_ORIGIN_UTILS << 16 | 1 << 31,
+};
+
+enum kstatus_dev_generic {
+    KSTATUS_DEV_GENERIC_OK,
+    KSTATUS_DEV_GENERIC_ERR = KSTATUS_ORIGIN_DEV_GENERIC << 16 | 1 << 31,
+    KSTATUS_DEV_GENERIC_NO_ISR,
+};
+
+enum kstatus_dev_io {
+    KSTATUS_DEV_IO_OK,
+    KSTATUS_DEV_IO_ERR = KSTATUS_ORIGIN_DEV_IO << 16 | 1 << 31,
+    KSTATUS_DEV_IO_TX_WAIT,
+    KSTATUS_DEV_IO_RX_WAIT,
+};
+
+enum kstatus_dev_gic {
+    KSTATUS_DEV_GIC_OK,
+    KSTATUS_DEV_GIC_ERR = KSTATUS_ORIGIN_DEV_GIC << 16 | 1 << 31,
+};
+
+enum kstatus_dev_timer {
+    KSTATUS_DEV_TIMER_OK,
+    KSTATUS_DEV_TIMER_ERR = KSTATUS_ORIGIN_DEV_TIMER << 16 | 1 << 31,
+};
+
+#endif  // KERNEL_LOG_H_

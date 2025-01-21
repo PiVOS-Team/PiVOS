@@ -1,0 +1,8 @@
+Checks: |
+    cppcoreguidelines-*,
+    clang-diagnostic-*,
+    clang-analyzer-*'
+    -cppcoreguidelines-avoid-magic-numbers
+    -cppcoreguidelines-avoid-non-const-global-variables
+    -clang-diagnostic-unused-command-line-argument
+WarningsAsErrors: true

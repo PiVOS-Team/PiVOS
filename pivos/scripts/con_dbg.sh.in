@@ -1,0 +1,5 @@
+#!/bin/sh
+$GDB \
+    -ex "file $ELF" \
+    -ex "target remote :1234" \
+    -ex "layout asm"
