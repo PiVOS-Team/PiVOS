@@ -7,7 +7,6 @@ ar = arch + '-ar'
 strip = arch + '-strip'
 objdump = arch + '-objdump'
 objcopy = arch + '-objcopy'
-gdb = arch + '-gdb'
 qemu = 'qemu-system-aarch64'
 
 [host_machine]

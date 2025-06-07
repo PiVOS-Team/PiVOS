@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "configurations": [
+        {
+            "name": "Run and debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "envFile": "${workspaceFolder}/build/misc/.env",
+            "program": "${workspaceFolder}/build/debug/$ELF_NAME_",
+            "cwd": "${workspaceFolder}",
+            "miDebuggerServerAddress": "$GDB_SERVER_:$GDB_PORT_",
+            "miDebuggerPath": "$GDB_PATH_",
+            "MIMode": "gdb",
+            "targetArchitecture": "arm64",
+            "setupCommands": [
+                {
+                    "description": "Add debug symbols also at physical address - allows to debug parts of kernel before turning on MMU",
+                    "text": "add-symbol-file ${workspaceFolder}/build/debug/$ELF_NAME_ $KERNEL_PHYS_ADDR_"
+                }
+            ],
+            "preLaunchTask": "Build and start debug",
+            "postDebugTask": "Stop QEMU"
+        },
+    ]
+}
