@@ -1,0 +1,87 @@
+{
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "buildType",
+            "type": "pickString",
+            "description": "Select build type",
+            "options": [
+                "debug",
+                "release"
+            ],
+            "default": "debug"
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Change build type",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/default_build.sh --set --${input:buildType}"
+        },
+        {
+            "label": "Build project",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/build.sh",
+        },
+        {
+            "label": "Rebuild project",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/build.sh --clean && ${workspaceFolder}/tools/build.sh",
+        },
+        {
+            "label": "Start QEMU in debug",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/run.sh --debug --gdb",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "QEMU",
+                "pattern": {
+                    "regexp": ".*",
+                    "message": 0
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Starting",
+                    "endsPattern": "QEMU"
+                }
+            }
+        },
+        {
+            "label": "Start QEMU",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/run.sh",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "QEMU",
+                "pattern": {
+                    "regexp": ".*",
+                    "message": 0
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Starting",
+                    "endsPattern": "QEMU"
+                }
+            }
+        },
+        {
+            "label": "Stop QEMU",
+            "type": "shell",
+            "command": "pkill -f qemu-system-aarch64",
+        },
+        {
+            "label": "Build and start debug",
+            "dependsOn": [
+                "Build project",
+                "Start QEMU in debug"
+            ],
+        },
+        {
+            "label": "Build and start",
+            "dependsOn": [
+                "Build project",
+                "Start QEMU"
+            ],
+        },
+    ],
+}

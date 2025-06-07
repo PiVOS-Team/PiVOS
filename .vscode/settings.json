@@ -1,0 +1,12 @@
+{
+    "C_Cpp.clang_format_style": "${workspaceFolder}/pivos/.clang-format",
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "files.exclude": {
+        "build/.default_build": true,
+        "build/misc": true,
+        "build": true,
+        ".github": true,
+        ".vscode": true
+    }
+}
