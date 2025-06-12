@@ -1,0 +1,6 @@
+#!/bin/sh
+$GDB_PATH \
+    -ex "file $ELF_PATH" \
+    -ex "add-symbol-file $ELF_PATH $KERNEL_PHYS_ADDR" \
+    -ex "target remote $GDB_SERVER:$GDB_PORT" \
+    -ex "layout asm"

@@ -1,0 +1,11 @@
+#!/bin/sh
+$QEMU_PATH \
+    -M $QEMU_BOARD \
+    -nographic \
+    -serial mon:stdio \
+    -kernel $IMG_PATH \
+    -cpu $QEMU_CPU \
+    -smp 4 \
+    -m 2G \
+    -S \
+    -gdb tcp::$GDB_PORT

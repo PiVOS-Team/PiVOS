@@ -1,22 +1,7 @@
-#!/bin/bash
-TOOLS_PATH=$(dirname "$(readlink -f "$0")")
-PROJECT_PATH=$(dirname $TOOLS_PATH)
+#!/bin/sh
+set -e
 
-source $PROJECT_PATH/build/misc/.env
-source $TOOLS_PATH/parser.sh
+DEFAULT_BUILD=.default_build
 
-declare -A FLAGS=()
-declare -A OPTS=()
-
-parse_args FLAGS OPTS "$@"
-
-if [[ ${FLAGS["--set"]} ]]; then
-    if [[ ${FLAGS["--debug"]} ]]; then
-        echo "debug" > $PROJECT_PATH/build/.default_build
-    elif [[ ${FLAGS["--release"]} ]]; then
-        echo "release" > $PROJECT_PATH/build/.default_build
-    fi
-elif [[ ${FLAGS["--get"]} ]]; then
-    cat $PROJECT_PATH/build/.default_build
-fi
-
+[ ! -z $1 ] && [ -d $1 ] && echo $1 > $DEFAULT_BUILD && ln -sf $(realpath $1)/launch.json .vscode/launch.json
+cat $DEFAULT_BUILD

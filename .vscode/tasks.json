@@ -16,7 +16,7 @@
         {
             "label": "Change build type",
             "type": "shell",
-            "command": "${workspaceFolder}/tools/default_build.sh --set --${input:buildType}"
+            "command": "${workspaceFolder}/tools/default_build.sh ${input:buildType}"
         },
         {
             "label": "Build project",
@@ -24,14 +24,9 @@
             "command": "${workspaceFolder}/tools/build.sh",
         },
         {
-            "label": "Rebuild project",
-            "type": "shell",
-            "command": "${workspaceFolder}/tools/build.sh --clean && ${workspaceFolder}/tools/build.sh",
-        },
-        {
             "label": "Start QEMU in debug",
             "type": "shell",
-            "command": "${workspaceFolder}/tools/run.sh --debug --gdb",
+            "command": "${workspaceFolder}/tools/start_debug.sh",
             "isBackground": true,
             "problemMatcher": {
                 "owner": "QEMU",
@@ -49,7 +44,7 @@
         {
             "label": "Start QEMU",
             "type": "shell",
-            "command": "${workspaceFolder}/tools/run.sh",
+            "command": "${workspaceFolder}/tools/start.sh",
             "isBackground": true,
             "problemMatcher": {
                 "owner": "QEMU",
