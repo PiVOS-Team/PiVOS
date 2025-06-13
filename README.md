@@ -26,7 +26,7 @@ sudo pacman -S qemu gdb aarch64-linux-gnu-gcc meson ninja
 
 ```bash
 git clone https://github.com/PiVOS-Team/PiVOS.git && cd PiVOS \
-./tools/setup_project.sh
+./tools/setup.sh
 ```
 
 `aarch64-linux-gnu.txt` should be modified so that the correct binaries are set.
@@ -35,78 +35,60 @@ git clone https://github.com/PiVOS-Team/PiVOS.git && cd PiVOS \
 
 ### Build
 
-*Command*
+Build the project:
 ```
-./tools/build.sh [--debug | --release] [--clean] 
+./tools/build.sh
 ```
-
-*Description*
-- If no build type is specified the default option will be used
-- Running this with `--clean` removes all compilation data 
 
 *VS Code*
 - This operation can be performed by `Build project` or `Rebuild project` task
 
-### Default Build
+### Change build type
 
-*Command*
+Change the build type:
 ```
-./tools/default_build.sh (--set | --get ) (--debug | --release)
+./tools/default_build.sh ( release | debug )
 ```
-
-*Description*
-- Allows you to change or read the default build type
 
 *VS Code*
 - This operation can be performed by `Change build type` task
 
 ## Run
 
-*Command*
+Start the project in QEMU:
 ```
-./tools/run.sh [--debug | --release] [--gdb]
+./tools/start.sh
 ```
-
-*Description*
-- If no build type is specified the default option will be used
-- `--gdb` param can be only used for debug build
-- starts QEMU for specified build
 
 *VS Code*
-- For both builds 
-    - `Start QEMU` or `Build and start` tasks
-    - Notice - `Run->Run Without Debugging` doesn't work
-- For debug build only (enables GDB) 
-    - `Start QEMU in debug` or `Build and start debug` tasks
-    - Also you can use `Run->Start Debugging`, press `F5`, or use `Run and Debug` menu
+- `Start QEMU` or `Build and start` tasks
+- Notice - `Run->Run Without Debugging` doesn't work
 
 ## Debug
 
-*Command*
+Start the project in QEMU and wait for GDB to connect:
 ```
-./tools/debugger.sh
+./tools/start_debug.sh
 ```
 
-*Description*
-- open gdb with all necessary configuration
-- QEMU must be already running (with `--gdb` flag)
+connect with GDB:
+```
+./tools/connect_debugger.sh
+```
 
 *VS Code*
-- Described in `Run` section
+- `Start QEMU in debug` or `Build and start debug` tasks
+- Also you can use `Run->Start Debugging`, press `F5`, or use `Run and Debug` menu
 
 > [!TIP]
 > `[ No Assembly Available ]` message is normal and is easily fixed by stepping.
 
 ## Utils
 
-*Command*
+Format or lint sources:
 ```
-./tools/utils.sh [--debug | --release] (--format | --tidy)
+./tools/utils.sh ( clang-format | clang-tidy )
 ```
-
-*Description*
-- If no build type is specified the default option will be used
-- Command use rules specified in `.clang-format` and `.clang-tidy` files
 
 *VS Code*
 - No special action is required - by default file is formatted every save
@@ -119,5 +101,5 @@ The following options are available in the `pivos/meson.options` file:
 
 After making changes
 ```
-./tools/setup_project.sh --reconfigure
+./tools/setup.sh --reconfigure
 ```
