@@ -34,7 +34,7 @@ int_dispatch_fn dev_gicv2_kdev_gic_get_dispatch(void *ctx) {
     return gicv2_dispatch;
 }
 
-void gicv2_dispatch(int64_t *_rs) {
+void gicv2_dispatch(int64_t *_rs, uint64_t _esr) {
     int32_t irq_id     = gicv2_get_irq_id();
     int32_t irq_device = irq_devices[irq_id];
 

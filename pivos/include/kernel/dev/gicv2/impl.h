@@ -8,7 +8,7 @@ void gicv2_set_int_target(uint32_t id, uint8_t cpu);
 void gicv2_set_int_group(uint32_t id, uint8_t group);
 void gicv2_set_int_trigger(uint32_t id, uint8_t trigger);
 
-void gicv2_dispatch(int64_t *_rs);
+void gicv2_dispatch(int64_t *_rs, uint64_t _esr);
 int32_t gicv2_get_irq_id();
 void gicv2_end_isr(int32_t irq_id);
 
