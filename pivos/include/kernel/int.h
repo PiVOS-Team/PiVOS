@@ -9,7 +9,9 @@
 
 #include <stdint.h>
 
-typedef void (*int_dispatch_fn)(int64_t *);
+// Add ESR read
+
+typedef void (*int_dispatch_fn)(int64_t *, uint64_t);
 
 extern void vector_table();
 
@@ -45,7 +47,7 @@ void int_dispatch(enum int_type type, int64_t *rs);
 
 void int_register(enum int_type type, int_dispatch_fn dispatch);
 
-void int_not_implemented_dispatch(int64_t *rs);
+void int_not_implemented_dispatch(int64_t *rs, uint64_t esr);
 
 void int_init_dispatch_tab();
 

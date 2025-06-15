@@ -2,3 +2,4 @@ release
 debug
 .default_build
 .vscode/launch.json
+.vscode/settings.json

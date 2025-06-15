@@ -25,6 +25,16 @@ static inline void byteset(uint8_t* dst, uint32_t value, uint64_t num) {
     }
 }
 
+static inline uint32_t bytecmp(uint8_t *a, uint8_t *b, uint32_t n) {
+    for(int32_t i = 0; i< n; i++) {
+        if (a[i] != b[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define BIT(bit) ((1) << bit)
