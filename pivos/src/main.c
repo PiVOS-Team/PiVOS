@@ -1,5 +1,6 @@
 #include <kernel/int.h>
 #include <kernel/log.h>
+#include <kernel/memory.h>
 #include <kernel/utils.h>
 
 #include <kernel/dev.h>
@@ -51,6 +52,8 @@ void test_action() {
 static char msg[] = "PiVOS\r\n";
 
 void kernel_main() {
+    memory_init(GB_IN_B * 4);
+
     int_init_dispatch_tab();
     setup_devices();
 

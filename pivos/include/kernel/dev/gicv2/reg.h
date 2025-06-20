@@ -6,7 +6,7 @@
 #include <kernel/utils.h>
 
 #ifndef GICV2_ADDRESS
-#define GICV2_ADDRESS 0xFF840000
+#define GICV2_ADDRESS (0xFF840000 + KERNEL_SPACE_MASK)
 #endif  // GICV2_ADDRESS
 
 struct bit32 {

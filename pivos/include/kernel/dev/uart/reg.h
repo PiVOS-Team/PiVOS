@@ -6,7 +6,7 @@
 #include <kernel/utils.h>
 
 #ifndef UART_ADDRESS
-#define UART_ADDRESS 0xfe201000UL
+#define UART_ADDRESS (0xfe201000UL + KERNEL_SPACE_MASK)
 #endif  // UART_ADDRESS
 
 union uart_dr {
