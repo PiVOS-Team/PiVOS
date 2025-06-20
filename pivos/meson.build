@@ -32,14 +32,14 @@ link_args = ['-nostdlib']
 headers = include_directories('include')
 
 sources = files(
-    'src/boot.s',
+    'src/boot/boot.S',
     'src/boot/mmu.S',
     'src/dev.c',
     'src/dev/generic_timer.c',
     'src/dev/gicv2.c',
     'src/dev/uart.c',
     'src/int.c',
-    'src/int/int_table.s',
+    'src/int/int_table.S',
     'src/libc.c',
     'src/main.c',
     'src/utils.c',
