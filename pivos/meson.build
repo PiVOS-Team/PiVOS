@@ -41,6 +41,8 @@ sources = files(
     'src/int/int_table.s',
     'src/libc.c',
     'src/main.c',
+    'src/utils.c',
+    'src/assert.c'
 )
 
 ldscript = custom_target(

@@ -1,7 +1,9 @@
 #ifndef KERNEL_UTILS_H_
 #define KERNEL_UTILS_H_
 
+#include <stddef.h>
 #include <stdint.h>
+#include <kernel/assert.h>
 
 // irq_lock/unlock shouldn't be in utils
 
