@@ -41,6 +41,7 @@ headers = include_directories('include')
 sources = files(
     'src/boot/boot.S',
     'src/boot/mmu.S',
+    'src/memory/allocator.c',
     'src/memory/mmu.c',
     'src/dev.c',
     'src/dev/generic_timer.c',
