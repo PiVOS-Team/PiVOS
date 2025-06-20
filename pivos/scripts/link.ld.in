@@ -1,25 +1,57 @@
 ENTRY(start)
+
+VIRT_MASK = $KERNEL_VIRT_MASK;
+PHYS_ADDR = $KERNEL_PHYS_ADDR;
+
 SECTIONS
 {
-    . = $ENTRY_OFFSET;
+    . = PHYS_ADDR;
+    boot_start = .;
 
-    .text : {
-        *(.boot)
+    .boot : AT(PHYS_ADDR) {
+        KEEP(*(.boot))
+    }
+
+    boot_end = .;
+
+    . = . + VIRT_MASK;
+    kernel_start = .;
+
+    .text : AT(ADDR(.text) - VIRT_MASK) {
         *(.text)
     }
 
-    .rodata : {
+    .rodata : AT(ADDR(.rodata) - VIRT_MASK) {
         *(.rodata)
     }
 
     . = ALIGN(16);
-    .data : {
+    .data : AT(ADDR(.data) - VIRT_MASK) {
         *(.data)
     }
 
-    .bss : {
+    .bss : AT(ADDR(.bss) - VIRT_MASK) {
         bss_start = .;
         *(.bss)
         bss_end = .;
     }
+
+    . = ALIGN(16);
+    .stack (NOLOAD) : AT(ADDR(.stack) - VIRT_MASK) {
+        stack_bottom = .;
+        . = . + 0x4000;
+        stack_top = .;
+    }
+
+    . = ALIGN(4096);
+    .mmu_space (NOLOAD) : AT(ADDR(.mmu_space) - VIRT_MASK) {
+        mmu_space_start = .;
+        . = . + (4096 * 3);
+        mmu_space_end = .;
+    }
+
+    kernel_end = .;
+    boot_size = boot_end - boot_start;
+    kernel_size = kernel_end - kernel_start;
+    image_size = boot_size + kernel_size;
 }

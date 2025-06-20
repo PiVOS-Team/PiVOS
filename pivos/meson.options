@@ -9,8 +9,8 @@ option('cpu_model', type : 'combo', choices : [
     value : 'cortex-a72'
 )
 
-option('kernel_physical_addr', type : 'string', value : '0x0000000000080000')
-option('kernel_virtual_addr', type : 'string', value : '0xffff000000080000')
+option('kernel_physical_addr', type : 'string', value : '0x80000')
+option('kernel_virtual_mask', type : 'string', value : '0xFFFF000000000000')
 
 option('gdb_debug_port', type : 'string', value : '1234')
 option('gdb_server_address', type : 'string', value : '127.0.0.1')

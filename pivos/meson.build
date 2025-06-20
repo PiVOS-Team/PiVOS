@@ -6,7 +6,7 @@ project(
     default_options: [],
 )
 
-kernel_virtual_addr = get_option('kernel_virtual_addr')
+kernel_virtual_mask = get_option('kernel_virtual_mask')
 kernel_physical_addr = get_option('kernel_physical_addr')
 gdb_debug_port = get_option('gdb_debug_port')
 gdb_server_address = get_option('gdb_server_address')
@@ -49,7 +49,8 @@ ldscript = custom_target(
     output: 'link.ld',
     command: fill_cmd,
     env: {
-        'ENTRY_OFFSET': kernel_physical_addr,
+        'KERNEL_PHYS_ADDR': kernel_physical_addr,
+        'KERNEL_VIRT_MASK': kernel_virtual_mask
     },
     build_by_default: false,
 )
@@ -86,7 +87,7 @@ env = {
     'IMG_PATH': img.full_path(),
     'ELF_PATH': elf.full_path(),
     'KERNEL_PHYS_ADDR': kernel_physical_addr,
-    'KERNEL_VIRT_ADDR': kernel_virtual_addr,
+    'KERNEL_VIRT_MASK': kernel_virtual_mask,
 }
 
 launch = custom_target(
