@@ -33,6 +33,7 @@ headers = include_directories('include')
 
 sources = files(
     'src/boot.s',
+    'src/boot/mmu.S',
     'src/dev.c',
     'src/dev/generic_timer.c',
     'src/dev/gicv2.c',
