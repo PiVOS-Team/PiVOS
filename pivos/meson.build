@@ -6,6 +6,13 @@ project(
     default_options: [],
 )
 
+if get_option('buildtype') == 'debug'
+    add_project_arguments('-DDEBUG', '-DASSERT_LEVEL=3', '-DARM_MMU_GRANULE_SIZE_4KB', language: 'c')
+endif
+
+add_project_arguments('-DARM_MMU_GRANULE_SIZE_4KB', language: 'c')
+
+
 kernel_virtual_mask = get_option('kernel_virtual_mask')
 kernel_physical_addr = get_option('kernel_physical_addr')
 gdb_debug_port = get_option('gdb_debug_port')
@@ -34,6 +41,7 @@ headers = include_directories('include')
 sources = files(
     'src/boot/boot.S',
     'src/boot/mmu.S',
+    'src/memory/mmu.c',
     'src/dev.c',
     'src/dev/generic_timer.c',
     'src/dev/gicv2.c',
