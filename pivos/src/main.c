@@ -1,5 +1,3 @@
-#include <kernel/call.h>
-#include <kernel/call/dev.h>
 #include <kernel/int.h>
 #include <kernel/log.h>
 #include <kernel/proc.h>
@@ -10,7 +8,13 @@
 #include <kernel/dev/gicv2.h>
 #include <kernel/dev/uart.h>
 
+#include <kernel/call.h>
+#include <kernel/call/dev.h>
+#include <kernel/call/proc.h>
+
 #include <kernel/test.h>
+#include <kernel/test2.h>
+#include <kernel/test3.h>
 
 int32_t setup_devices() {
     int32_t status = 0;
@@ -47,16 +51,15 @@ int32_t setup_devices() {
     return status;
 }
 
-void kcall_test(int64_t *rs) {
-    rs[0] *= 2;
-}
-
 int32_t setup_syscalls() {
     int32_t status = 0;
 
     int_register(INT_TYPE_low_el_aarch64_sync, kcall_dispatch);
 
-    if ((status = kcall_register(1, kcall_test)) < 0)
+    if ((status = kcall_register(0, kcall_proc_exit)) < 0)
+        return status;
+
+    if ((status = kcall_register(1, kcall_proc_start)) < 0)
         return status;
 
     if ((status = kcall_register(2, kcall_io_write)) < 0)
@@ -75,9 +78,11 @@ int32_t setup_syscalls() {
 void test_action() {
 }
 
-static char msg[] = "PiVOS\r\n";
-
-static uint64_t el0_stack[4096];
+static void *programs[] = {
+    (void *)a_img,
+    (void *)b_img,
+    (void *)c_img,
+};
 
 void kernel_main() {
     uint64_t irq_key = irq_lock();
@@ -90,11 +95,7 @@ void kernel_main() {
 
     irq_unlock(irq_key);
 
-    bytecpy((uint8_t *)0x10000000UL, a_img, a_img_len);
-
-    struct kproc proc = {.stack = el0_stack, .text = (uint64_t *)0x10000000UL};
-
-    kproc_exec(&proc);
+    kproc_exec(a_img, a_img_len);
 
     return;
 }

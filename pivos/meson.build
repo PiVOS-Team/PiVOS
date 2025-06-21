@@ -41,6 +41,7 @@ sources = files(
     'src/int/int_table.s',
     'src/call.c',
     'src/call/dev.c',
+    'src/call/proc.c',
     'src/proc.c',
     'src/libc.c',
     'src/main.c',
