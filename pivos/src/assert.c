@@ -11,6 +11,7 @@ void assert_check(uint8_t condition_result, char *message) {
     }
 
     uint32_t i = 0;
+    // NOLINTNEXTLINE(clang-analyzer-security.PointerSub)
     uint64_t max_length = &stack_top - &stack_bottom;
     uint64_t base_addr = (uint64_t)&stack_bottom;
 

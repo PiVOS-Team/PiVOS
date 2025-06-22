@@ -8,7 +8,7 @@ int test_func1() {
 }
 
 void int_dispatch(enum int_type type, int64_t *rs) {
-    uint64_t esr_el1;
+    uint64_t esr_el1 = 0;
     int_dispatch_fn dispatch = int_dispatch_tab[type];
     __asm__ volatile("mrs %[esr_el1], esr_el1" : [esr_el1] "=r"(esr_el1));
     dispatch(rs, esr_el1);

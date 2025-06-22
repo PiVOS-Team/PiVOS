@@ -1,9 +1,8 @@
 #ifndef KERNEL_PROC_H_
 #define KERNEL_PROC_H_
 
-#include <stdint.h>
-
 #include <kernel/memory.h>
+#include <stdint.h>
 
 #ifndef KPROC_MAX_COUNT
 #define KPROC_MAX_COUNT 16
@@ -33,6 +32,6 @@ void kproc_exec(uint32_t prog_id);
 
 int32_t kproc_start(uint32_t prog_id, int64_t *rs);
 
-int32_t kproc_exit();
+int32_t kproc_exit(int64_t *rs);
 
 #endif  // KERNEL_PROC_H_

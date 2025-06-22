@@ -1,17 +1,15 @@
+#include <kernel/call.h>
+#include <kernel/call/dev.h>
+#include <kernel/call/proc.h>
+#include <kernel/dev.h>
+#include <kernel/dev/generic_timer.h>
+#include <kernel/dev/gicv2.h>
+#include <kernel/dev/uart.h>
 #include <kernel/int.h>
 #include <kernel/log.h>
 #include <kernel/memory.h>
 #include <kernel/proc.h>
 #include <kernel/utils.h>
-
-#include <kernel/dev.h>
-#include <kernel/dev/generic_timer.h>
-#include <kernel/dev/gicv2.h>
-#include <kernel/dev/uart.h>
-
-#include <kernel/call.h>
-#include <kernel/call/dev.h>
-#include <kernel/call/proc.h>
 
 int32_t setup_devices() {
     int32_t status = 0;
@@ -28,8 +26,8 @@ int32_t setup_devices() {
     if ((status = kdev_register(0, (struct kdev_generic *)dev_gicv2_get())) < 0)
         return status;
 
-    if ((status =
-             kdev_register(1, (struct kdev_generic *)dev_generic_timer_get())) < 0)
+    if ((status = kdev_register(
+             1, (struct kdev_generic *)dev_generic_timer_get())) < 0)
         return status;
 
     if ((status = kdev_register(2, (struct kdev_generic *)dev_uart_get(0))) < 0)
@@ -38,12 +36,13 @@ int32_t setup_devices() {
     int_register(INT_TYPE_cur_el_spn_irq, kdev_gic_get_dispatch(0));
     int_register(INT_TYPE_low_el_aarch64_irq, kdev_gic_get_dispatch(0));
 
-    struct dev_gicv2_params gicv2_timer_params = {.priority = 0, .cpu = 1, .trigger = 2};
+    struct dev_gicv2_params gicv2_timer_params = {
+        .priority = 0, .cpu = 1, .trigger = 2};
     kdev_gic_register_irq(0, 30, 1, &gicv2_timer_params);
     kdev_gic_enable_irq(0, 30);
 
-    struct dev_gicv2_params gicv2_uart_params =
-        {.priority = 0, .cpu = 1, .trigger = 2};
+    struct dev_gicv2_params gicv2_uart_params = {
+        .priority = 0, .cpu = 1, .trigger = 2};
     kdev_gic_register_irq(0, 153, 2, &gicv2_uart_params);
     kdev_gic_enable_irq(0, 153);
 
@@ -69,7 +68,6 @@ int32_t setup_syscalls() {
 
     if ((status = kcall_register(4, kcall_io_poll_out)) < 0)
         return status;
-
 
     return status;
 }

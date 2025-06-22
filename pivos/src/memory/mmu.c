@@ -22,7 +22,7 @@ static inline void mmu_override_memory_type(uint64_t* mmu_table, uint32_t idx,
     union mmu_lower_attributes lower_attr =
         (union mmu_lower_attributes)(uint16_t)entries[idx]
             .fields.lower_attributes;
-    
+
     lower_attr.fields_stage_1.AttrIndx = memory_type;
 
     entries[idx].fields.lower_attributes = (uint64_t)lower_attr.bits;
@@ -455,7 +455,7 @@ void mmu_map_units(uint64_t* mmu_table, uint8_t level, uint64_t address,
     while (count > 0) {
         struct mmu_entry_info table_data = mmu_traverse_and_alloc_tables(
             mmu_table, level, address + offset, destination_level);
-        
+
         uint32_t unit_count =
             MIN(mmu_number_of_level_entries[destination_level] - table_data.idx,
                 count);

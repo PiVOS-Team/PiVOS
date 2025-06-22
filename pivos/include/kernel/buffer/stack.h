@@ -1,9 +1,8 @@
 #ifndef KERNEL_BUFFER_STACK_H_
 #define KERNEL_BUFFER_STACK_H_
 
-#include <stdint.h>
-
 #include <kernel/utils.h>
+#include <stdint.h>
 
 struct kbuffer_stack {
     uint8_t *buffer;
@@ -12,9 +11,10 @@ struct kbuffer_stack {
     uint32_t align;
 };
 
-#define KBUFFER_STACK_INIT(_capacity, _buffer, _align)                            \
-    (struct kbuffer_stack) {                                                      \
-        .buffer = (_buffer), .capacity = (_capacity), .len = 0, .align = (_align) \
+#define KBUFFER_STACK_INIT(_capacity, _buffer, _align)          \
+    (struct kbuffer_stack) {                                    \
+        .buffer = (_buffer), .capacity = (_capacity), .len = 0, \
+        .align = (_align)                                       \
     }
 
 static inline uint64_t kbuffer_stack_full(struct kbuffer_stack *stack) {
@@ -40,7 +40,6 @@ static inline uint8_t *kbuffer_stack_alloc(struct kbuffer_stack *stack) {
 
     stack->len++;
     uint8_t *addr = kbuffer_stack_peek(stack);
-
 
     return addr;
 }
