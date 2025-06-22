@@ -1,6 +1,5 @@
-#include <stddef.h>
-
 #include <kernel/int.h>
+#include <stddef.h>
 
 int_dispatch_fn int_dispatch_tab[INT_TYPE__N];
 

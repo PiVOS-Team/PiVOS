@@ -1,9 +1,9 @@
 #ifndef KERNEL_UTILS_H_
 #define KERNEL_UTILS_H_
 
+#include <kernel/assert.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <kernel/assert.h>
 
 // irq_lock/unlock shouldn't be in utils
 
@@ -11,7 +11,7 @@ static inline void idle() {
     __asm__ volatile("wfe");
 }
 
-static inline void bytecpy(uint8_t *dst, uint8_t *src, uint64_t n) {
+static inline void bytecpy(uint8_t* dst, uint8_t* src, uint64_t n) {
     for (uint64_t i = 0; i < n; i++) {
         dst[i] = src[i];
     }

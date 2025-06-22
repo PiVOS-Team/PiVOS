@@ -31,9 +31,10 @@ extern void vector_table();
     F(low_el_aarch32_fiq)    \
     F(low_el_aarch32_serror)
 
-
 #define INT_ENUM_ENTRY(name) INT_TYPE_##name,
-enum int_type { INT_LIST(INT_ENUM_ENTRY) INT_TYPE__N };
+enum int_type {
+    INT_LIST(INT_ENUM_ENTRY) INT_TYPE__N
+};
 #undef INT_ENUM_ENTRY
 
 #define INT_ISR_PROTYPE(name) void int_##name##_isr(int64_t *);

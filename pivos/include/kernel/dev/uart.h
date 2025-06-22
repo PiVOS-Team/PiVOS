@@ -6,9 +6,8 @@
 #define KDEV_UART_COUNT 10
 #endif  // KDEV_UART_RING_SIZE
 
-#include <stdint.h>
-
 #include <kernel/dev.h>
+#include <stdint.h>
 
 int32_t dev_uart_init(int32_t uart_id);
 struct kdev_io *dev_uart_get(int32_t uart_id);

@@ -31,7 +31,6 @@ int32_t kdev_io_write(int32_t dev_id, uint8_t *src, uint32_t n) {
     return kdev->write(kdev->ctx, src, n);
 }
 
-
 int32_t kdev_io_read(int32_t dev_id, uint8_t *dst, uint32_t n) {
     struct kdev_io *kdev = (struct kdev_io *)kdevs[dev_id];
     if (kdev->type != KDEV_IO) {
@@ -50,7 +49,6 @@ int32_t kdev_io_pool_out(int32_t dev_id, uint8_t c) {
     return kdev->pool_out(kdev->ctx, c);
 }
 
-
 int32_t kdev_io_pool_in(int32_t dev_id, uint8_t *c) {
     struct kdev_io *kdev = (struct kdev_io *)kdevs[dev_id];
     if (kdev->type != KDEV_IO) {
@@ -60,8 +58,8 @@ int32_t kdev_io_pool_in(int32_t dev_id, uint8_t *c) {
     return kdev->pool_in(kdev->ctx, c);
 }
 
-int32_t kdev_gic_register_irq(
-    int32_t dev_id, uint32_t irq_id, int32_t irq_dev_id, void *params) {
+int32_t kdev_gic_register_irq(int32_t dev_id, uint32_t irq_id,
+                              int32_t irq_dev_id, void *params) {
     struct kdev_gic *kdev = (struct kdev_gic *)kdevs[dev_id];
     if (kdev->type != KDEV_GIC) {
         return KSTATUS_DEV_INVALID;

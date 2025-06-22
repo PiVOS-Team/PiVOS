@@ -11,7 +11,7 @@ void *memset(void *ptr, int value, size_t num) {
 }
 
 void *memcpy(void *destination, const void *source, size_t num) {
-    unsigned char *dst_c       = destination;
+    unsigned char *dst_c = destination;
     const unsigned char *src_c = source;
 
     for (uint32_t i = 0; i < num; i++) {

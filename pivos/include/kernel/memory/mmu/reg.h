@@ -1,8 +1,8 @@
 #ifndef KERNEL_MEMORY_MMU_REG_H_
 #define KERNEL_MEMORY_MMU_REG_H_
 
-#include <stdint.h>
 #include <kernel/utils.h>
+#include <stdint.h>
 
 #define MMU_TYPE_MASK 0b11
 #define MMU_ENTRY_VALID_MASK 0b01
@@ -47,22 +47,22 @@ union mmu_block_entry {
 union mmu_page_entry {
     uint64_t bits;
     struct __attribute__((packed)) {
-        uint64_t valid                  : 1;
-        uint64_t descriptor             : 1;
-        uint64_t lower_attributes       : 10;
-        uint64_t output_address         : 36;
-        uint64_t RES0                   : 3;
-        uint64_t upper_attributes       : 13;
+        uint64_t valid            : 1;
+        uint64_t descriptor       : 1;
+        uint64_t lower_attributes : 10;
+        uint64_t output_address   : 36;
+        uint64_t RES0             : 3;
+        uint64_t upper_attributes : 13;
     } fields;
 };
 
 union mmu_memory_entry_common {
     uint64_t bits;
     struct __attribute__((packed)) {
-        uint64_t valid                  : 1;
-        uint64_t descriptor             : 1;
-        uint64_t lower_attributes       : 10;
-        uint64_t RES                    : 52;
+        uint64_t valid            : 1;
+        uint64_t descriptor       : 1;
+        uint64_t lower_attributes : 10;
+        uint64_t RES              : 52;
     } fields;
 };
 
@@ -79,16 +79,10 @@ union mmu_table_entry {
     } fields;
 };
 
-static const uint64_t mmu_number_of_level_entries[4] = {
-    512, 512, 512, 512
-};
+static const uint64_t mmu_number_of_level_entries[4] = {512, 512, 512, 512};
 
-static const uint64_t mmu_size_of_level_region[4] = {
-    GB_IN_B * 512,
-    GB_IN_B * 1,
-    MB_IN_B * 2,
-    KB_IN_B * 4
-};
+static const uint64_t mmu_size_of_level_region[4] = {GB_IN_B * 512, GB_IN_B * 1,
+                                                     MB_IN_B * 2, KB_IN_B * 4};
 
 #elif defined(ARM_MMU_GRANULE_SIZE_16KB)
 #define MMU_GRANULE_SIZE (KB_IN_B * 16)
@@ -124,6 +118,5 @@ union mmu_upper_attributes {
         uint16_t PBHA       : 4;
     } fields_stage_1;
 };
-
 
 #endif  // KERNEL_MEMORY_MMU_REG_H_

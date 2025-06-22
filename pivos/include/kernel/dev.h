@@ -1,10 +1,9 @@
 #ifndef KERNEL_DEVICE_H_
 #define KERNEL_DEVICE_H_
 
-#include <stdint.h>
-
 #include <kernel/int.h>
 #include <kernel/log.h>
+#include <stdint.h>
 
 #ifndef KDEV_BUFFER_SIZE
 #define KDEV_BUFFER_SIZE 1024
@@ -63,8 +62,8 @@ int32_t kdev_io_pool_out(int32_t dev_id, uint8_t c);
 
 int32_t kdev_io_pool_in(int32_t dev_id, uint8_t *c);
 
-int32_t kdev_gic_register_irq(
-    int32_t dev_id, uint32_t irq_id, int32_t irq_dev_id, void *params);
+int32_t kdev_gic_register_irq(int32_t dev_id, uint32_t irq_id,
+                              int32_t irq_dev_id, void *params);
 
 int32_t kdev_gic_enable_irq(int32_t dev_id, uint32_t irq_id);
 

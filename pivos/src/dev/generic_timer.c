@@ -1,5 +1,4 @@
 #include <kernel/dev.h>
-
 #include <kernel/dev/generic_timer.h>
 #include <kernel/dev/generic_timer/impl.h>
 #include <kernel/dev/generic_timer/reg.h>
@@ -12,9 +11,9 @@ int32_t dev_generic_timer_init(uint16_t _interval) {
     interval = _interval;
     generic_timer_reset();
     kdev = (struct kdev_timer){
-        .type       = KDEV_TIMER,
-        .ctx        = 0,
-        .isr        = dev_generic_timer_kdev_isr,
+        .type = KDEV_TIMER,
+        .ctx = 0,
+        .isr = dev_generic_timer_kdev_isr,
         .set_action = dev_generic_timer_kdev_set_action,
     };
     return 0;
@@ -40,11 +39,11 @@ void generic_timer_reset() {
 
     asm volatile("mrs %[dst], cntfrq_el0" : [dst] "=r"(frq));
 
-    uint32_t freq          = frq.fields.ClockFrequency;
+    uint32_t freq = frq.fields.ClockFrequency;
     tval.fields.TimerValue = freq * interval;
 
     ctl.fields.ISTATUS = 0;
-    ctl.fields.ENABLE  = 1;
+    ctl.fields.ENABLE = 1;
 
     asm volatile("msr cntp_tval_el0, %[src]" : : [src] "r"(tval.bits));
     asm volatile("msr cntp_ctl_el0, %[src]" : : [src] "r"(ctl.bits));

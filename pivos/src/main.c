@@ -25,7 +25,8 @@ int32_t setup_devices() {
     if ((status = kdev_register(0, (struct kdev_generic *)dev_gicv2_get())) < 0)
         return status;
 
-    if ((status = kdev_register(1, (struct kdev_generic *)dev_generic_timer_get())) < 0)
+    if ((status =
+             kdev_register(1, (struct kdev_generic *)dev_generic_timer_get())) < 0)
         return status;
 
     if ((status = kdev_register(2, (struct kdev_generic *)dev_uart_get(0))) < 0)
@@ -37,7 +38,8 @@ int32_t setup_devices() {
     kdev_gic_register_irq(0, 30, 1, &gicv2_timer_params);
     kdev_gic_enable_irq(0, 30);
 
-    struct dev_gicv2_params gicv2_uart_params = {.priority = 0, .cpu = 1, .trigger = 2};
+    struct dev_gicv2_params gicv2_uart_params =
+        {.priority = 0, .cpu = 1, .trigger = 2};
     kdev_gic_register_irq(0, 153, 2, &gicv2_uart_params);
     kdev_gic_enable_irq(0, 153);
 

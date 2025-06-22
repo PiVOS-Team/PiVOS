@@ -20,9 +20,7 @@ static void* get_phys_space_one_to_one(struct mmu_phys_space_request* request) {
 }
 
 static const memory_mmu_get_phys_space_callback get_phys_space[2] = {
-    get_phys_space_alloc,
-    get_phys_space_one_to_one
-};
+    get_phys_space_alloc, get_phys_space_one_to_one};
 
 int32_t memory_init(uint64_t size) {
     uint64_t number_of_pages = size / MMU_PAGE_SIZE;
@@ -35,41 +33,42 @@ int32_t memory_init(uint64_t size) {
 
     // Prepare allocator
 
-    memory_allocator_init((void*)ALIGN_UP_PAGE((uint64_t)&kernel_end), number_of_pages, MMU_PAGE_SIZE);
+    memory_allocator_init((void*)ALIGN_UP_PAGE((uint64_t)&kernel_end),
+                          number_of_pages, MMU_PAGE_SIZE);
     memory_allocator_claim_range((void*)0, (void*)ALIGN_UP_PAGE(image_size));
-    memory_allocator_claim_range((void*)ALIGN_DOWN_PAGE(peripherials_start), (void*)ALIGN_UP_PAGE(peripherials_end));
+    memory_allocator_claim_range((void*)ALIGN_DOWN_PAGE(peripherials_start),
+                                 (void*)ALIGN_UP_PAGE(peripherials_end));
 
     memory_mmu_init(memory_allocator_claim_pages, memory_allocator_free_pages);
 
     // Prepare kernel regions
 
-    s_kernel_memory_context = (struct memory_context){
-        .level0_table = (uint64_t*)&mmu_space_start
-    };
+    s_kernel_memory_context =
+        (struct memory_context){.level0_table = (uint64_t*)&mmu_space_start};
 
     struct memory_region normal_memory_region_1 = {
-        .memory_type = MEMORY_TYPE_NORMAL_NO_CACHE, 
+        .memory_type = MEMORY_TYPE_NORMAL_NO_CACHE,
         .va = 0x0,
-        .size = peripherials_start
-    };
+        .size = peripherials_start};
 
     struct memory_region peripherals_region = {
         .memory_type = MEMORY_TYPE_DEVICE,
         .va = peripherials_start,
-        .size = peripherials_end - peripherials_start
-    };
+        .size = peripherials_end - peripherials_start};
 
     struct memory_region normal_memory_region_2 = {
         .memory_type = MEMORY_TYPE_NORMAL_NO_CACHE,
         .va = peripherials_end,
-        .size = size - peripherials_end
-    };
+        .size = size - peripherials_end};
 
-    memory_map_region(&s_kernel_memory_context, &normal_memory_region_1, MEMORY_MAP_ONE_TO_ONE);
+    memory_map_region(&s_kernel_memory_context, &normal_memory_region_1,
+                      MEMORY_MAP_ONE_TO_ONE);
 
-    memory_map_region(&s_kernel_memory_context, &peripherals_region, MEMORY_MAP_ONE_TO_ONE);
+    memory_map_region(&s_kernel_memory_context, &peripherals_region,
+                      MEMORY_MAP_ONE_TO_ONE);
 
-    memory_map_region(&s_kernel_memory_context, &normal_memory_region_2, MEMORY_MAP_ONE_TO_ONE);
+    memory_map_region(&s_kernel_memory_context, &normal_memory_region_2,
+                      MEMORY_MAP_ONE_TO_ONE);
 
     return 0;
 }
@@ -82,6 +81,9 @@ void memory_destroy_context(struct memory_context* context) {
     memory_mmu_destroy_table(context->level0_table);
 }
 
-void memory_map_region(struct memory_context* context, struct memory_region* region, enum memory_map_type map_type) {
-    memory_mmu_insert(context->level0_table, 0, region->va, region->size, region->memory_type, get_phys_space[map_type]);
+void memory_map_region(struct memory_context* context,
+                       struct memory_region* region,
+                       enum memory_map_type map_type) {
+    memory_mmu_insert(context->level0_table, 0, region->va, region->size,
+                      region->memory_type, get_phys_space[map_type]);
 }

@@ -1,9 +1,8 @@
 #ifndef KERNEL_DEV_UART_REG_H_
 #define KERNEL_DEV_UART_REG_H_
 
-#include <stdint.h>
-
 #include <kernel/utils.h>
+#include <stdint.h>
 
 #ifndef UART_ADDRESS
 #define UART_ADDRESS (0xfe201000UL + KERNEL_SPACE_MASK)

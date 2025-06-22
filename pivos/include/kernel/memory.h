@@ -6,9 +6,9 @@
 // !!! CAUTION !!!
 // DO NOT CHANGE THIS ORDER
 // These values are set in MAIR_EL1 register during boot stage
-enum memory_region_type { 
-    MEMORY_TYPE_NORMAL_NO_CACHE = 0, 
-    MEMORY_TYPE_DEVICE = 1 
+enum memory_region_type {
+    MEMORY_TYPE_NORMAL_NO_CACHE = 0,
+    MEMORY_TYPE_DEVICE = 1
 };
 
 enum memory_map_type {
@@ -32,6 +32,8 @@ void memory_create_context(struct memory_context* context);
 
 void memory_destroy_context(struct memory_context* context);
 
-void memory_map_region(struct memory_context* context, struct memory_region* region, enum memory_map_type map_type);
+void memory_map_region(struct memory_context* context,
+                       struct memory_region* region,
+                       enum memory_map_type map_type);
 
 #endif  // KERNEL_MEMORY_H_

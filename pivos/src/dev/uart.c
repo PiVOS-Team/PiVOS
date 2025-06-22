@@ -1,18 +1,17 @@
 #include <kernel/buffer/ring.h>
 #include <kernel/dev.h>
-#include <kernel/int.h>
-
 #include <kernel/dev/uart.h>
 #include <kernel/dev/uart/impl.h>
 #include <kernel/dev/uart/reg.h>
+#include <kernel/int.h>
 
 static struct dev_uart uart_impls[KDEV_UART_COUNT];
 static struct kdev_io uart_kdevs[KDEV_UART_COUNT];
 
 int32_t dev_uart_kdev_write(void *ctx, uint8_t *src, uint32_t n) {
     struct dev_uart *dev = ctx;
-    int32_t idx          = 0;
-    uint64_t irq_key     = irq_lock();
+    int32_t idx = 0;
+    uint64_t irq_key = irq_lock();
     for (; idx < n; idx++) {
         if (kbuffer_ring_write(&dev->tx, src[idx]) < 0) {
             break;
@@ -58,7 +57,7 @@ int32_t dev_uart_sync_write(void *ctx) {
         }
 
         union uart_dr dr;
-        dr.fields.DATA    = (uint8_t)res;
+        dr.fields.DATA = (uint8_t)res;
         dev->reg->DR.bits = dr.bits;
     }
 }
@@ -83,7 +82,7 @@ int32_t dev_uart_sync_read(void *ctx) {
 
 int32_t dev_uart_kdev_isr(void *ctx) {
     struct dev_uart *dev = ctx;
-    union uart_mis mis   = {.bits = dev->reg->MIS.bits};
+    union uart_mis mis = {.bits = dev->reg->MIS.bits};
 
     if (mis.fields.TXMIS) {
         dev_uart_sync_write(ctx);
@@ -103,7 +102,7 @@ int32_t dev_uart_kdev_pool_out(void *ctx, uint8_t c) {
         return KSTATUS_DEV_IO_TX_WAIT;
     }
     union uart_dr dr;
-    dr.fields.DATA    = c;
+    dr.fields.DATA = c;
     dev->reg->DR.bits = dr.bits;
     return KSTATUS_DEV_IO_OK;
 }
@@ -117,25 +116,27 @@ int32_t dev_uart_kdev_pool_in(void *ctx, uint8_t *c) {
     }
 
     union uart_dr dr = {.bits = dev->reg->DR.bits};
-    *c               = dr.fields.DATA;
+    *c = dr.fields.DATA;
     return KSTATUS_DEV_IO_OK;
 }
 
 int32_t dev_uart_init(int32_t uart_id) {
-    struct uart *reg    = (struct uart *)((UART_ADDRESS) + 0x200 * uart_id);
+    struct uart *reg = (struct uart *)((UART_ADDRESS) + 0x200 * uart_id);
     uart_impls[uart_id] = (struct dev_uart){
         .reg = reg,
-        .tx = KBUFFER_RING_INIT(KDEV_UART_RING_SIZE, uart_impls[uart_id].tx_buf),
-        .rx = KBUFFER_RING_INIT(KDEV_UART_RING_SIZE, uart_impls[uart_id].rx_buf),
+        .tx =
+            KBUFFER_RING_INIT(KDEV_UART_RING_SIZE, uart_impls[uart_id].tx_buf),
+        .rx =
+            KBUFFER_RING_INIT(KDEV_UART_RING_SIZE, uart_impls[uart_id].rx_buf),
     };
 
     uart_kdevs[uart_id] = (struct kdev_io){
-        .type     = KDEV_IO,
-        .ctx      = &uart_impls[uart_id],
-        .isr      = dev_uart_kdev_isr,
-        .write    = dev_uart_kdev_write,
-        .read     = dev_uart_kdev_read,
-        .pool_in  = dev_uart_kdev_pool_in,
+        .type = KDEV_IO,
+        .ctx = &uart_impls[uart_id],
+        .isr = dev_uart_kdev_isr,
+        .write = dev_uart_kdev_write,
+        .read = dev_uart_kdev_read,
+        .pool_in = dev_uart_kdev_pool_in,
         .pool_out = dev_uart_kdev_pool_out,
     };
 
@@ -148,31 +149,31 @@ int32_t dev_uart_init(int32_t uart_id) {
 
     // datasize
     union uart_lcrh lcrh = {.bits = 0x0};
-    lcrh.fields.WLEN     = 0b11;
-    lcrh.fields.FEN      = 0x1;
-    reg->LCRH.bits       = lcrh.bits;
+    lcrh.fields.WLEN = 0b11;
+    lcrh.fields.FEN = 0x1;
+    reg->LCRH.bits = lcrh.bits;
 
     // interrupt masks
     union uart_imsc imsc = {.bits = 0x0};
-    imsc.fields.TXIM     = 1;
-    imsc.fields.RXIM     = 1;
-    reg->IMSC.bits       = imsc.bits;
+    imsc.fields.TXIM = 1;
+    imsc.fields.RXIM = 1;
+    reg->IMSC.bits = imsc.bits;
 
     union uart_ifls ifls = {.bits = reg->IFLS.bits};
     ifls.fields.RXIFLSEL = 0b010;
     ifls.fields.TXIFLSEL = 0b010;
-    reg->IFLS.bits       = ifls.bits;
+    reg->IFLS.bits = ifls.bits;
 
     // enable uart
     union uart_cr cr = {.bits = 0x0};
     cr.fields.UARTEN = 1;
-    cr.fields.TXE    = 1;
-    cr.fields.RXE    = 1;
+    cr.fields.TXE = 1;
+    cr.fields.RXE = 1;
 
     // hardware control flow
     cr.fields.CTSEN = 0;
     cr.fields.RTSEN = 0;
-    reg->CR.bits    = cr.bits;
+    reg->CR.bits = cr.bits;
 
     return 0;
 }

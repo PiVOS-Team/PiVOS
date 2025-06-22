@@ -3,14 +3,15 @@
 #include <stddef.h>
 
 #define PAGE_FULL (~0ULL)
-#define PAGES_PER_ENTRY 64 // NOLINT
+#define PAGES_PER_ENTRY 64  // NOLINT
 
-static uint64_t *s_bitmap;
+static uint64_t* s_bitmap;
 static uint64_t s_bitmap_entry_count;
 static uint64_t s_page_size;
 
-static inline uint64_t memory_allocator_convert_to_mask(uint32_t number, uint32_t offset) {
-    return (~0ULL << (PAGES_PER_ENTRY - number)) >> offset; // NOLINT
+static inline uint64_t memory_allocator_convert_to_mask(uint32_t number,
+                                                        uint32_t offset) {
+    return (~0ULL << (PAGES_PER_ENTRY - number)) >> offset;  // NOLINT
 }
 
 static inline uint32_t memory_allocator_get_page_number(uint64_t addr) {
@@ -22,22 +23,26 @@ static inline uint64_t memory_allocator_get_addres(uint32_t page_number) {
 }
 
 static inline void memory_allocator_claim_specific_page(uint32_t page_number) {
-    uint64_t mask = memory_allocator_convert_to_mask(1, page_number % PAGES_PER_ENTRY);
+    uint64_t mask =
+        memory_allocator_convert_to_mask(1, page_number % PAGES_PER_ENTRY);
     s_bitmap[page_number / PAGES_PER_ENTRY] |= mask;
 }
 
 static inline void memory_allocator_free_specific_page(uint32_t page_number) {
-    uint64_t mask = ~memory_allocator_convert_to_mask(1, page_number % PAGES_PER_ENTRY);
+    uint64_t mask =
+        ~memory_allocator_convert_to_mask(1, page_number % PAGES_PER_ENTRY);
     s_bitmap[page_number / PAGES_PER_ENTRY] &= mask;
 }
 
-static void memory_allocator_claim_multiple_pages(uint32_t page_number, uint32_t count) {
+static void memory_allocator_claim_multiple_pages(uint32_t page_number,
+                                                  uint32_t count) {
     uint32_t entry = page_number / PAGES_PER_ENTRY;
     uint32_t offset = page_number % PAGES_PER_ENTRY;
     uint32_t pages_to_claim = MIN((PAGES_PER_ENTRY - offset), count);
 
-    while(count > 0) {
-        uint64_t mask = memory_allocator_convert_to_mask(pages_to_claim, offset);
+    while (count > 0) {
+        uint64_t mask =
+            memory_allocator_convert_to_mask(pages_to_claim, offset);
         s_bitmap[entry] |= mask;
         entry++;
         count -= pages_to_claim;
@@ -46,13 +51,15 @@ static void memory_allocator_claim_multiple_pages(uint32_t page_number, uint32_t
     }
 }
 
-static void memory_allocator_free_multiple_pages(uint32_t page_number, uint32_t count) {
+static void memory_allocator_free_multiple_pages(uint32_t page_number,
+                                                 uint32_t count) {
     uint32_t entry = page_number / PAGES_PER_ENTRY;
     uint32_t offset = page_number % PAGES_PER_ENTRY;
     uint32_t pages_to_free = MIN((PAGES_PER_ENTRY - offset), count);
 
-    while(count > 0) {
-        uint64_t mask = ~memory_allocator_convert_to_mask(pages_to_free, offset);
+    while (count > 0) {
+        uint64_t mask =
+            ~memory_allocator_convert_to_mask(pages_to_free, offset);
         s_bitmap[entry] &= mask;
         entry++;
         count -= pages_to_free;
@@ -62,8 +69,10 @@ static void memory_allocator_free_multiple_pages(uint32_t page_number, uint32_t 
 
 // allocator.h
 
-void memory_allocator_init(void* addr, uint32_t number_of_pages, uint32_t page_size) {
-    ASSERT(LOW, (uint64_t)addr % page_size == 0, "Bitmap addr must be aligned to page size");
+void memory_allocator_init(void* addr, uint32_t number_of_pages,
+                           uint32_t page_size) {
+    ASSERT(LOW, (uint64_t)addr % page_size == 0,
+           "Bitmap addr must be aligned to page size");
 
     s_page_size = page_size;
     s_bitmap = (uint64_t*)addr;
@@ -71,23 +80,26 @@ void memory_allocator_init(void* addr, uint32_t number_of_pages, uint32_t page_s
     byteset((uint8_t*)s_bitmap, 0, s_bitmap_entry_count * sizeof(uint64_t));
 
     // Claim bitmap region in bitmap
-    uint64_t bitmap_end = (uint64_t)s_bitmap + s_bitmap_entry_count * sizeof(uint64_t);
-    memory_allocator_claim_range(s_bitmap, (void*)ALIGN_UP(bitmap_end, s_page_size));
+    uint64_t bitmap_end =
+        (uint64_t)s_bitmap + s_bitmap_entry_count * sizeof(uint64_t);
+    memory_allocator_claim_range(s_bitmap,
+                                 (void*)ALIGN_UP(bitmap_end, s_page_size));
 }
 
 void* memory_allocator_claim_page() {
     uint64_t current_entry = 0;
-    for (uint64_t entry_idx = 0; entry_idx < s_bitmap_entry_count; entry_idx++) {
+    for (uint64_t entry_idx = 0; entry_idx < s_bitmap_entry_count;
+         entry_idx++) {
         current_entry = s_bitmap[entry_idx];
-        
+
         // This is necessary because result
         // of __builtin_clzll(0) is undefined
-        
-        if(current_entry == PAGE_FULL) {
+
+        if (current_entry == PAGE_FULL) {
             continue;
         }
-        
-        // We are looking for the first one from left - decrease segmentation.        
+
+        // We are looking for the first one from left - decrease segmentation.
         // After negation all claimed pages are represented by 0
         // __builtin_clzll return number of leading zeros in nubmer
         // so the number will be index of first free page
@@ -102,9 +114,11 @@ void* memory_allocator_claim_page() {
     return NULL;
 }
 
-void memory_allocator_claim_range(void *from, void *to) {
-    ASSERT(HIGH, (uint64_t)from % s_page_size == 0 && (uint64_t)to % s_page_size == 0, "Addres must be aligned");
-    
+void memory_allocator_claim_range(void* from, void* to) {
+    ASSERT(HIGH,
+           (uint64_t)from % s_page_size == 0 && (uint64_t)to % s_page_size == 0,
+           "Addres must be aligned");
+
     uint32_t from_page = memory_allocator_get_page_number((uint64_t)from);
     uint32_t to_page = memory_allocator_get_page_number((uint64_t)to);
     uint32_t pages_to_claim = to_page - from_page;
@@ -117,7 +131,7 @@ void memory_allocator_claim_range(void *from, void *to) {
 }
 
 void* memory_allocator_claim_pages(uint32_t number, uint32_t align) {
-    if(number == 1 && align == 1) {
+    if (number == 1 && align == 1) {
         return memory_allocator_claim_page();
     }
 
@@ -135,18 +149,17 @@ void* memory_allocator_claim_pages(uint32_t number, uint32_t align) {
         current_entry = s_bitmap[entry_idx];
         current_mask = memory_allocator_convert_to_mask(pages_to_claim, offset);
 
-        if((current_entry & current_mask) == 0) {
+        if ((current_entry & current_mask) == 0) {
             pages_left -= pages_to_claim;
             entry_idx++;
             offset = 0;
-        }
-        else {
-
+        } else {
             // If number of checked pages is greater than align, it
             // means there is no sense to check from current_page + align,
             // because we already now that part of these pages are claimed
             uint32_t checked_pages = number - pages_left;
-            current_page += checked_pages > align ? ALIGN_UP(checked_pages, align) : align;
+            current_page +=
+                checked_pages > align ? ALIGN_UP(checked_pages, align) : align;
 
             offset = current_page % PAGES_PER_ENTRY;
             entry_idx = current_page / PAGES_PER_ENTRY;
@@ -154,7 +167,7 @@ void* memory_allocator_claim_pages(uint32_t number, uint32_t align) {
         }
     }
 
-    if(pages_left == 0) {
+    if (pages_left == 0) {
         memory_allocator_claim_multiple_pages(current_page, number);
         return (void*)memory_allocator_get_addres(current_page);
     }
@@ -169,8 +182,10 @@ void memory_allocator_free_page(void* addr) {
     memory_allocator_free_specific_page(page_number);
 }
 
-void memory_allocator_free_range(void *from, void *to) {
-    ASSERT(HIGH, (uint64_t)from % s_page_size == 0 && (uint64_t)to % s_page_size == 0, "Addres must be aligned");
+void memory_allocator_free_range(void* from, void* to) {
+    ASSERT(HIGH,
+           (uint64_t)from % s_page_size == 0 && (uint64_t)to % s_page_size == 0,
+           "Addres must be aligned");
 
     uint32_t from_page = memory_allocator_get_page_number((uint64_t)from);
     uint32_t to_page = memory_allocator_get_page_number((uint64_t)to);

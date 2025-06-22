@@ -52,7 +52,6 @@ sources = files(
     'src/int/int_table.S',
     'src/libc.c',
     'src/main.c',
-    'src/utils.c',
     'src/assert.c'
 )
 

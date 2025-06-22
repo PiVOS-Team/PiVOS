@@ -1,9 +1,8 @@
 #ifndef KERNEL_DEV_GICV2_REG_H_
 #define KERNEL_DEV_GICV2_REG_H_
 
-#include <stdint.h>
-
 #include <kernel/utils.h>
+#include <stdint.h>
 
 #ifndef GICV2_ADDRESS
 #define GICV2_ADDRESS (0xFF840000 + KERNEL_SPACE_MASK)
@@ -76,70 +75,60 @@ struct __attribute__((packed)) gich {};
 union gicc_dir {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_iidr {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_nsapr0 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_apr0 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_ahppir {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_aeoir {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_aiar {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_abpr {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_hppir {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicc_rpr {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
@@ -164,7 +153,6 @@ union gicc_iar {
 union gicc_bpr {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
@@ -231,119 +219,102 @@ static_assert(offsetof(struct gicc, DIR) == 0x1000, "Invalid offset");
 union gicd_cidr3 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_cidr2 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_cidr1 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_cidr0 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_pidr3 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_pidr2 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_pidr1 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_pidr0 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_pidr7 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_pidr6 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_pidr5 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_pidr4 {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_spendsgir {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_cpendsgir {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_sgir {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_spisr {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
 union gicd_ppisr {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
@@ -400,7 +371,6 @@ union gicd_igroupr {
 union gicd_iidr {
     volatile uint32_t bits;
     struct __attribute__((packed)) {
-
     } fields;
 };
 
