@@ -56,7 +56,8 @@ sources = files(
     'src/proc.c',
     'src/libc.c',
     'src/main.c',
-    'src/assert.c'
+    'src/assert.c',
+    'src/loader/elf.c'
 )
 
 ldscript = custom_target(

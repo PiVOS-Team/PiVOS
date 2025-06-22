@@ -1,4 +1,5 @@
 #include <kernel/buffer/stack.h>
+#include <kernel/loader/elf.h>
 #include <kernel/log.h>
 #include <kernel/memory.h>
 #include <kernel/proc.h>
@@ -16,9 +17,9 @@ static struct memory_region kproc_region = {
 
 #include <kernel/example.h>
 static struct kproc_prog_entry kproc_prog_tab[] = {
-    {.text = a_img, .size = a_img_len},
-    {.text = b_img, .size = b_img_len},
-    {.text = c_img, .size = c_img_len}};
+    {.text = a_elf, .size = a_elf_len},
+    {.text = b_elf, .size = b_elf_len},
+    {.text = c_elf, .size = c_elf_len}};
 
 uint64_t kproc_count() {
     return kbuffer_stack_size(&kproc_stack);
@@ -31,7 +32,6 @@ struct kproc *kproc_alloc() {
     }
 
     memory_create_context(&kproc->ctx);
-    memory_map_region(&kproc->ctx, &kproc_region, MEMORY_MAP_ALLOC);
 
     return kproc;
 }
@@ -72,9 +72,32 @@ int32_t kproc_mem_switch(struct kproc *proc) {
 }
 
 int32_t kproc_init(struct kproc_prog_entry *prog) {
-    bytecpy((uint8_t *)KPROC_PROG_OFFSET, prog->text, prog->size);
-    __asm__ volatile("msr sp_el0, %[stack]" : : [stack] "r"(KPROC_PROG_OFFSET));
-    __asm__ volatile("msr elr_el1, %[text]" : : [text] "r"(KPROC_PROG_OFFSET));
+    struct kproc *kproc = (struct kproc *)kbuffer_stack_peek(&kproc_stack);
+
+    struct elf_file elf = {.bytes = prog->text, .length = prog->size};
+
+    if (elf_read(&elf) != 0) {
+        return 1;
+    }
+
+    uint64_t start_addr;
+    if (elf_load(&elf, &kproc->ctx, &start_addr) != 0) {
+        return 1;
+    }
+
+    uint64_t stack_addr = 0x00007ffffffff000;
+    uint64_t stack_size = 16 * KB_IN_B;
+    uint64_t stack_end = stack_addr + stack_size;
+    struct memory_region stack_region = {
+        .memory_type = MEMORY_TYPE_NORMAL_NO_CACHE,
+        .va = stack_addr,
+        .size = stack_size};
+
+    memory_map_region(&kproc->ctx, &stack_region, MEMORY_MAP_ALLOC);
+
+    // bytecpy((uint8_t *)KPROC_PROG_OFFSET, prog->text, prog->size);
+    __asm__ volatile("msr sp_el0, %[stack]" : : [stack] "r"(stack_end));
+    __asm__ volatile("msr elr_el1, %[text]" : : [text] "r"(start_addr));
     return KSTATUS_PROC_OK;
 }
 

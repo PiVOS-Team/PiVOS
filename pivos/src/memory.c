@@ -84,6 +84,7 @@ void memory_destroy_context(struct memory_context* context) {
 void memory_map_region(struct memory_context* context,
                        struct memory_region* region,
                        enum memory_map_type map_type) {
-    memory_mmu_insert(context->level0_table, 0, region->va, region->size,
-                      region->memory_type, get_phys_space[map_type]);
+    memory_mmu_insert(context->level0_table, 0, ALIGN_DOWN_PAGE(region->va),
+                      ALIGN_UP_PAGE(region->size), region->memory_type,
+                      get_phys_space[map_type]);
 }
