@@ -11,9 +11,17 @@ static inline void idle() {
     __asm__ volatile("wfe");
 }
 
-static inline void bytecpy(uint8_t *dst, uint8_t *src, uint32_t n) {
-    for (int32_t i = 0; i < n; i++) {
+static inline void bytecpy(uint8_t *dst, uint8_t *src, uint64_t n) {
+    for (uint64_t i = 0; i < n; i++) {
         dst[i] = src[i];
+    }
+}
+
+static inline void byteset(uint8_t* dst, uint32_t value, uint64_t num) {
+    uint8_t* ptr_c = dst;
+
+    for (uint64_t i = 0; i < num; i++) {
+        ptr_c[i] = (uint8_t)value;
     }
 }
 
@@ -34,8 +42,5 @@ static inline void bytecpy(uint8_t *dst, uint8_t *src, uint32_t n) {
 #define PA_TO_KERNEL_VA(ptr) (typeof(ptr))((uint64_t)(ptr) | KERNEL_SPACE_MASK)
 
 #define static_assert(condition, msg) _Static_assert(condition, msg)
-
-void *memory_set(void *ptr, int value, uint64_t num);
-void *memory_copy(void *destination, const void *source, uint64_t num);
 
 #endif  // KERNEL_UTILS_H_

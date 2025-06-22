@@ -6,10 +6,6 @@
 static void *(*s_pages_alloc)(uint32_t pages, uint32_t align);
 static void (*s_pages_dealloc)(void *addr, uint32_t number);
 
-static inline uint8_t mmu_are_entries_same_type(uint64_t entry1, uint64_t entry2) {
-    return (entry1 & MMU_TYPE_MASK) == (entry2 & MMU_TYPE_MASK);
-}
-
 static inline uint8_t mmu_is_same_memory_type(uint64_t entry, uint8_t memory_type) {
     union mmu_memory_entry_common common = (union mmu_memory_entry_common)entry;
     return ((union mmu_lower_attributes)(uint16_t)common.fields.lower_attributes).fields_stage_1.AttrIndx == memory_type;
@@ -25,10 +21,10 @@ static inline void mmu_override_memory_type(uint64_t* mmu_table, uint32_t idx, u
 
 static inline uint64_t mmu_get_address_from_block_entry(uint64_t entry, uint8_t level) {
     if(level == 1) {
-        return ((union mmu_block_entry)entry).fields_level_1.output_address << MMU_BLOCK_ENTRY_LEVEL1_OUTPUT_ADDRESS;
+        return (uint64_t)((union mmu_block_entry)entry).fields_level_1.output_address << MMU_BLOCK_ENTRY_LEVEL1_OUTPUT_ADDRESS;
     }
     else if(level == 2) {
-        return ((union mmu_block_entry)entry).fields_level_2.output_address << MMU_BLOCK_ENTRY_LEVEL2_OUTPUT_ADDRESS;
+        return (uint64_t)((union mmu_block_entry)entry).fields_level_2.output_address << MMU_BLOCK_ENTRY_LEVEL2_OUTPUT_ADDRESS;
     }
 
     return 0;
@@ -57,22 +53,27 @@ void memory_mmu_init(void* (*pages_alloc)(uint32_t number, uint32_t align), void
     s_pages_dealloc = pages_dealloc;
 }
 
-void memory_mmu_create_context(struct memory_mmu_context *context) {
-    context->level0_table = mmu_create_table();
+uint64_t* memory_mmu_create_table() {
+    // This addr is | with KERNEL_SPACE_MASK to make it accessible from kernel
+    // 16 most significant bits are ignored when creating table entries
+    
+    uint64_t* new_table_addr = (uint64_t*)((uint64_t)s_pages_alloc(1, 1) | KERNEL_SPACE_MASK);
+    byteset((uint8_t*)new_table_addr, 0, MMU_PAGE_SIZE);
+    return new_table_addr;
 }
 
-void memory_mmu_destroy_context(struct memory_mmu_context* context) {
+void memory_mmu_destroy_table(uint64_t* level0_table) {
     for(uint32_t idx = 0; idx < mmu_number_of_level_entries[0]; idx++) {
-        if(context->level0_table[idx] != MMU_EMPTY_ENTRY) {
-            mmu_remove(context->level0_table, idx, 0);
+        if(level0_table[idx] != MMU_EMPTY_ENTRY) {
+            mmu_destroy_entry(level0_table, idx, 0);
         }
     }
 
-    s_pages_dealloc(context->level0_table, 1);
+    s_pages_dealloc(level0_table, 1);
 }
 
-void* memory_mmu_va_to_pa(struct memory_mmu_context* context, void* va) {
-    struct mmu_entry_info search_result = mmu_find(context->level0_table, 0, (uint64_t)va);
+void* memory_mmu_va_to_pa(uint64_t* level0_table, void* va) {
+    struct mmu_entry_info search_result = mmu_find(level0_table, 0, (uint64_t)va);
     uint64_t entry = search_result.table[search_result.idx];
     uint8_t type = entry & MMU_TYPE_MASK;
 
@@ -86,23 +87,45 @@ void* memory_mmu_va_to_pa(struct memory_mmu_context* context, void* va) {
     return NULL;
 }
 
-void memory_mmu_map_region(struct memory_mmu_context *context, struct memory_mmu_region *region, enum memory_mmu_map_type map_type) {
-    mmu_insert(context->level0_table, 0, region->va, region->size, region->memory_type, map_type_to_callback[map_type]);
+void memory_mmu_insert(uint64_t* mmu_table, uint8_t level, uint64_t address, uint64_t size, uint8_t memory_type, memory_mmu_get_phys_space_callback get_phys_space) {
+
+    // Every type of granulation allows block entries at level 2
+    // Other levels of block entries are currently unsupported (for example level 1 for 4KB granule)
+
+    uint64_t block_size = mmu_size_of_level_region[2];
+    uint64_t block_address = ALIGN_UP(address, block_size);
+
+    if(size >= block_address - address + block_size) {
+        uint64_t offset = 0;
+        
+        // Alloc pages until reach desired size or allign to alloc blocks 
+        uint32_t count_temp = MIN(size, block_address - address);
+        if(count_temp > 0) {
+            mmu_map_units(mmu_table, level, address, memory_type, count_temp, 3, mmu_create_page_entry, get_phys_space);
+            offset += count_temp * MMU_PAGE_SIZE; 
+        }
+
+        // Alloc as many as possible blocks
+        count_temp = (size - offset) / block_size;
+        if(count_temp > 0) {
+            mmu_map_units(mmu_table, level, address + offset, memory_type, count_temp, 2, mmu_create_block_entry, get_phys_space);
+            offset += count_temp * block_size;
+        }
+
+        // Alloc another pages to fill the gap after blocks
+        count_temp = (size - offset) / MMU_PAGE_SIZE;
+        if(count_temp > 0) {
+            mmu_map_units(mmu_table, level, address + offset, memory_type, count_temp, 3, mmu_create_page_entry, get_phys_space);
+        }
+    }
+    else {
+        mmu_map_units(mmu_table, level, address, memory_type, size / MMU_PAGE_SIZE, 3, mmu_create_page_entry, get_phys_space);
+    }
 }
 
 // impl.h
 
-uint64_t* mmu_create_table() {
-
-    // This addr is | with KERNEL_SPACE_MASK to make it accessible from kernel
-    // 16 most significant bits are ignored when creating table entries
-    
-    uint64_t* new_table_addr = (uint64_t*)((uint64_t)s_pages_alloc(1, 1) | KERNEL_SPACE_MASK);
-    memory_set(new_table_addr, 0, MMU_PAGE_SIZE);
-    return new_table_addr;
-}
-
-void mmu_destroy_table(uint64_t* mmu_table) {
+void mmu_dealloc_table(uint64_t* mmu_table) {
     s_pages_dealloc((void*)mmu_table, 1);
 }
 
@@ -127,8 +150,11 @@ void mmu_create_block_entry(uint64_t* mmu_table, uint32_t idx, uint8_t level, ui
 
     union mmu_block_entry new_block_entry;
     union mmu_lower_attributes lower_attributes = {
-        .fields_stage_1.AttrIndx = memory_type, 
-        .fields_stage_1.AF = 1
+        .fields_stage_1 = {
+            .AttrIndx = memory_type,
+            .AF = 1,
+            .AP = 0b01
+        }
     };
 
     // This part is specific for 4KB granule size
@@ -165,7 +191,8 @@ void mmu_create_page_entry(uint64_t* mmu_table, uint32_t idx, uint8_t level, uin
     union mmu_lower_attributes lower_attributes = {
         .fields_stage_1 = {
             .AttrIndx = memory_type,
-            .AF = 1
+            .AF = 1,
+            .AP = 0b01
         }
     };
 
@@ -192,12 +219,12 @@ uint64_t* mmu_get_subtable(uint64_t* mmu_table, uint32_t idx, uint8_t level) {
 }
 
 uint64_t* mmu_split_block_entry(uint64_t* mmu_table, uint32_t idx, uint8_t level) {
-    uint64_t* temp_table = mmu_create_table();
+    uint64_t* temp_table = memory_mmu_create_table();
 
     union mmu_block_entry entry = (union mmu_block_entry)mmu_table[idx];
     uint8_t next_level = level + 1;
-    uint8_t memory_type;
-    uint64_t new_table_base_address;
+    uint8_t memory_type = 0;
+    uint64_t new_table_base_address = 0;
     uint64_t unit_size = mmu_size_of_level_region[next_level];
 
     if(level == 1) {
@@ -230,7 +257,7 @@ struct mmu_entry_info mmu_traverse_and_alloc_tables(uint64_t* mmu_table, uint8_t
 
     uint8_t current_level = level;
     uint64_t current_address = address;
-    uint32_t current_level_idx;
+    uint32_t current_level_idx = 0;
     
     // This loop traverse through tables to reach destination level
     for(; current_level < destination_level; current_level++) {
@@ -243,7 +270,7 @@ struct mmu_entry_info mmu_traverse_and_alloc_tables(uint64_t* mmu_table, uint8_t
         if(!(type & MMU_ENTRY_VALID_MASK)) {
             // Empty or invalid - we need to alloc new table
 
-            uint64_t* new_table = mmu_create_table();
+            uint64_t* new_table = memory_mmu_create_table();
 
             mmu_create_table_entry(temp_table, current_level_idx, current_level, new_table);
             temp_table = new_table;
@@ -278,7 +305,7 @@ struct mmu_entry_info mmu_find(uint64_t* mmu_table, uint8_t level, uint64_t addr
 
     uint8_t current_level = level;
     uint64_t current_address = address;
-    uint32_t current_level_idx;
+    uint32_t current_level_idx = 0;
     
     // This loop traverse through tables to reach destination level
     for(; current_level < 3; current_level++) {
@@ -302,7 +329,7 @@ struct mmu_entry_info mmu_find(uint64_t* mmu_table, uint8_t level, uint64_t addr
     };
 }
 
-void mmu_remove(uint64_t* mmu_table, uint32_t idx, uint8_t level) {
+void mmu_destroy_entry(uint64_t* mmu_table, uint32_t idx, uint8_t level) {
     
     // If given node is located in level 3 table or is a block entry
     // we can simply destroy it without any tree traversing
@@ -366,7 +393,7 @@ void mmu_remove(uint64_t* mmu_table, uint32_t idx, uint8_t level) {
         }
 
         if(current_entry->idx == mmu_number_of_level_entries[current_entry->level]) {
-            mmu_destroy_table(current_entry->table);
+            mmu_dealloc_table(current_entry->table);
             table_stack_depth--;
             current_entry = &table_stack[table_stack_depth - 1];
         }
@@ -375,43 +402,7 @@ void mmu_remove(uint64_t* mmu_table, uint32_t idx, uint8_t level) {
     mmu_table[idx] = MMU_EMPTY_ENTRY;
 }
 
-void mmu_insert(uint64_t* mmu_table, uint8_t level, uint64_t address, uint64_t size, uint8_t memory_type, mmu_get_phys_space_callback get_phys_space) {
-
-    // Every type of granulation allows block entries at level 2
-    // Other levels of block entries are currently unsupported (for example level 1 for 4KB granule)
-
-    uint64_t block_size = mmu_size_of_level_region[2];
-    uint64_t block_address = ALIGN_UP(address, block_size);
-
-    if(size >= block_address - address + block_size) {
-        uint64_t offset = 0;
-        
-        // Alloc pages until reach desired size or allign to alloc blocks 
-        uint32_t count_temp = MIN(size, block_address - address);
-        if(count_temp > 0) {
-            mmu_map_units(mmu_table, level, address, memory_type, count_temp, 3, mmu_create_page_entry, get_phys_space);
-            offset += count_temp * MMU_PAGE_SIZE; 
-        }
-
-        // Alloc as many as possible blocks
-        count_temp = (size - offset) / block_size;
-        if(count_temp > 0) {
-            mmu_map_units(mmu_table, level, address + offset, memory_type, count_temp, 2, mmu_create_block_entry, get_phys_space);
-            offset += count_temp * block_size;
-        }
-
-        // Alloc another pages to fill the gap after blocks
-        count_temp = (size - offset) / MMU_PAGE_SIZE;
-        if(count_temp > 0) {
-            mmu_map_units(mmu_table, level, address + offset, memory_type, count_temp, 3, mmu_create_page_entry, get_phys_space);
-        }
-    }
-    else {
-        mmu_map_units(mmu_table, level, address, memory_type, size / MMU_PAGE_SIZE, 3, mmu_create_page_entry, get_phys_space);
-    }
-}
-
-void mmu_map_units(uint64_t* mmu_table, uint8_t level, uint64_t address, uint8_t memory_type, uint32_t count, uint8_t destination_level, mmu_create_memory_entry create_memory_entry, mmu_get_phys_space_callback get_phys_space) {
+void mmu_map_units(uint64_t* mmu_table, uint8_t level, uint64_t address, uint8_t memory_type, uint32_t count, uint8_t destination_level, mmu_create_memory_entry create_memory_entry, memory_mmu_get_phys_space_callback get_phys_space) {
     uint64_t offset = 0;
     uint64_t unit_size = mmu_size_of_level_region[destination_level];
     uint32_t pages_for_unit = unit_size / MMU_PAGE_SIZE;
@@ -448,7 +439,7 @@ void mmu_map_units(uint64_t* mmu_table, uint8_t level, uint64_t address, uint8_t
                     };
                     
                     uint64_t l3_entry = 0;
-                    for(uint32_t l3_idx; l3_idx < mmu_number_of_level_entries[3]; l3_idx++) {
+                    for(uint32_t l3_idx = 0; l3_idx < mmu_number_of_level_entries[3]; l3_idx++) {
                         l3_entry = pages[l3_idx];
                         if((l3_entry & MMU_TYPE_MASK) == MMU_EMPTY_ENTRY) {
                             mmu_create_page_entry(pages, l3_idx, 3, (uint64_t)get_phys_space(&request_page), memory_type);
@@ -476,12 +467,4 @@ void mmu_map_units(uint64_t* mmu_table, uint8_t level, uint64_t address, uint8_t
         offset += unit_count * unit_size;
         count -= unit_count;
     }
-}
-
-void* mmu_get_phys_space_alloc(struct mmu_phys_space_request* request) {
-    return s_pages_alloc(request->page_count, request->align);
-}
-
-void* mmu_get_phys_space_one_to_one(struct mmu_phys_space_request* request) {
-    return (void*)request->virt_addr;
 }

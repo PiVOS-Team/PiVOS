@@ -113,7 +113,7 @@
     TCR_SH_NON_SHAREABLE                        << TCR_FIELD_SH1 |      \
     TCR_TG1_GRANULE_4KB                         << TCR_FIELD_TG1 |      \
     TCR_IPS_32bit_4GB                           << TCR_FIELD_IPS |      \
-    TCR_AS_8bit                                 << TCR_FIELD_AS         \
+    TCR_AS_16bit                                << TCR_FIELD_AS         \
 )
 
 #define MAIR_VALUE (                                                                                            \

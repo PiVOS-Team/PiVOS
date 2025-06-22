@@ -13,13 +13,15 @@
 //
 // To change assert level go to meson.build
 
+// NOLINTBEGIN
+
 #ifdef DEBUG
 
 void assert_check(uint8_t condition_result, char *message);
 
 #define ASSERT_BASE(condition, message) assert_check((condition), (message))
 
-#if ASSERT_LEVEL >= 3
+#if ASSERT_LEVEL >= 1
 #define ASSERT_LOW(condition, message) ASSERT_BASE(condition, message)
 #else
 #define ASSERT_LOW(condition, message)
@@ -31,7 +33,7 @@ void assert_check(uint8_t condition_result, char *message);
 #define ASSERT_MID(condition, message)
 #endif
 
-#if ASSERT_LEVEL >= 1
+#if ASSERT_LEVEL >= 3
 #define ASSERT_HIGH(condition, message) ASSERT_BASE(condition, message)
 #else
 #define ASSERT_HIGH(condition, message)
@@ -45,6 +47,6 @@ void assert_check(uint8_t condition_result, char *message);
 
 #endif
 
-
+// NOLINTEND
 
 #endif

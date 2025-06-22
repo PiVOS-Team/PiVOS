@@ -3,14 +3,14 @@
 #include <stddef.h>
 
 #define PAGE_FULL (~0ULL)
-#define PAGES_PER_ENTRY 64
+#define PAGES_PER_ENTRY 64 // NOLINT
 
 static uint64_t *s_bitmap;
 static uint64_t s_bitmap_entry_count;
 static uint64_t s_page_size;
 
 static inline uint64_t memory_allocator_convert_to_mask(uint32_t number, uint32_t offset) {
-    return (~0ULL << (PAGES_PER_ENTRY - number)) >> offset;
+    return (~0ULL << (PAGES_PER_ENTRY - number)) >> offset; // NOLINT
 }
 
 static inline uint32_t memory_allocator_get_page_number(uint64_t addr) {
@@ -63,10 +63,12 @@ static void memory_allocator_free_multiple_pages(uint32_t page_number, uint32_t 
 // allocator.h
 
 void memory_allocator_init(void* addr, uint32_t number_of_pages, uint32_t page_size) {
+    ASSERT(LOW, (uint64_t)addr % page_size == 0, "Bitmap addr must be aligned to page size");
+
     s_page_size = page_size;
-    s_bitmap = (uint64_t*)(ALIGN_UP((uint64_t)addr, s_page_size));
+    s_bitmap = (uint64_t*)addr;
     s_bitmap_entry_count = number_of_pages / PAGES_PER_ENTRY;
-    memory_set(s_bitmap, 0, s_bitmap_entry_count * sizeof(uint64_t));
+    byteset((uint8_t*)s_bitmap, 0, s_bitmap_entry_count * sizeof(uint64_t));
 
     // Claim bitmap region in bitmap
     uint64_t bitmap_end = (uint64_t)s_bitmap + s_bitmap_entry_count * sizeof(uint64_t);
@@ -74,7 +76,7 @@ void memory_allocator_init(void* addr, uint32_t number_of_pages, uint32_t page_s
 }
 
 void* memory_allocator_claim_page() {
-    uint64_t current_entry;
+    uint64_t current_entry = 0;
     for (uint64_t entry_idx = 0; entry_idx < s_bitmap_entry_count; entry_idx++) {
         current_entry = s_bitmap[entry_idx];
         
@@ -119,8 +121,8 @@ void* memory_allocator_claim_pages(uint32_t number, uint32_t align) {
         return memory_allocator_claim_page();
     }
 
-    uint32_t current_entry;
-    uint64_t current_mask;
+    uint32_t current_entry = 0;
+    uint64_t current_mask = 0;
 
     uint32_t current_page = 0;
     uint32_t offset = 0;
