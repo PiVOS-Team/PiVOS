@@ -36,10 +36,17 @@ SECTIONS
         bss_end = .;
     }
 
+    . = ALIGN(8);
+    .drivers : AT(ADDR(.drivers) - VIRT_MASK) {
+        drivers_space_start = .;
+        KEEP(*(.drivers))
+        drivers_space_end = .;
+    }
+
     . = ALIGN(16);
     .stack (NOLOAD) : AT(ADDR(.stack) - VIRT_MASK) {
         stack_bottom = .;
-        . = . + 0x4000;
+        . = . + 0x8000;
         stack_top = .;
     }
 

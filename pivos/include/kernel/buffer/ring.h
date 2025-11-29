@@ -19,24 +19,25 @@ struct kbuffer_ring {
 
 static inline int32_t kbuffer_ring_write(struct kbuffer_ring *buf, uint8_t c) {
     if (buf->size == buf->capacity) {
-        return -1;
+        return 0;
     }
 
     buf->buffer[buf->write_idx] = c;
     buf->write_idx = (buf->write_idx + 1) % buf->capacity;
     buf->size++;
-    return 0;
+    return 1;
 }
 
-static inline int32_t kbuffer_ring_read(struct kbuffer_ring *buf) {
+static inline int32_t kbuffer_ring_read(struct kbuffer_ring *buf, uint8_t* b) {
     if (buf->size == 0) {
-        return -1;
+        return 0;
     }
 
-    int32_t c = buf->buffer[buf->read_idx];
+    *b = buf->buffer[buf->read_idx];
     buf->read_idx = (buf->read_idx + 1) % buf->capacity;
     buf->size--;
-    return c;
+
+    return 1;
 }
 
 static inline int32_t kbuffer_ring_free(struct kbuffer_ring *buf, uint32_t n) {

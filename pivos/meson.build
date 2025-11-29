@@ -7,11 +7,10 @@ project(
 )
 
 if get_option('buildtype') == 'debug'
-    add_project_arguments('-DDEBUG', '-DASSERT_LEVEL=3', '-DARM_MMU_GRANULE_SIZE_4KB', language: 'c')
+    add_project_arguments('-DDEBUG', '-DASSERT_LEVEL=3', language: 'c')
 endif
 
-add_project_arguments('-DARM_MMU_GRANULE_SIZE_4KB', language: 'c')
-
+add_project_arguments('-DMMU_PAGE_SIZE=4096', '-DTARGET_RPI_4B', language: 'c')
 
 kernel_virtual_mask = get_option('kernel_virtual_mask')
 kernel_physical_addr = get_option('kernel_physical_addr')
@@ -39,24 +38,49 @@ link_args = ['-nostdlib']
 headers = include_directories('include')
 
 sources = files(
-    'src/boot/boot.S',
-    'src/boot/mmu.S',
-    'src/memory.c',
-    'src/memory/allocator.c',
-    'src/memory/mmu.c',
-    'src/dev.c',
-    'src/dev/generic_timer.c',
-    'src/dev/gicv2.c',
-    'src/dev/uart.c',
-    'src/int.c',
-    'src/int/int_table.S',
-    'src/call.c',
-    'src/call/dev.c',
-    'src/call/proc.c',
-    'src/proc.c',
-    'src/libc.c',
-    'src/main.c',
-    'src/assert.c'
+    # kernel
+    'src/kernel/alloc/bitmap.c',
+
+    'src/kernel/device/bus.c',
+    'src/kernel/device/dev.c',
+    'src/kernel/device/dev_event.c',
+    'src/kernel/device/dev_registry.c',
+    'src/kernel/device/driver.c',
+    'src/kernel/device/irq_controller.c',
+    'src/kernel/device/timer.c',
+    'src/kernel/device/uart.c',
+
+    'src/kernel/assert.c',
+    'src/kernel/device.c',
+    'src/kernel/io_data.c',
+    'src/kernel/irq.c',
+    'src/kernel/libc.c',
+    'src/kernel/loader.c',
+    'src/kernel/main.c',
+    'src/kernel/mem.c',
+    'src/kernel/panic.c',
+    'src/kernel/proc.c',
+    'src/kernel/sched.c',
+    'src/kernel/syscall.c',
+    'src/kernel/userspace.c',
+
+    #drivers
+    'src/drivers/config.c',
+
+    'src/drivers/irq_controller/gic.c',
+    'src/drivers/uart/pl011.c',
+    'src/drivers/timer/arm_generic_timer.c',
+
+    #arch
+    #arm64
+    'src/arch/arm64/boot/boot.S',
+    'src/arch/arm64/boot/mmu.S',
+
+    'src/arch/arm64/armv8a_cpu.c',
+    'src/arch/arm64/armv8a_cpu.S',
+    'src/arch/arm64/int_table.S',
+    'src/arch/arm64/int.c',
+    'src/arch/arm64/mmu.c'
 )
 
 ldscript = custom_target(

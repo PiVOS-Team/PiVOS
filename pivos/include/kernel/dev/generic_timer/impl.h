@@ -1,6 +1,0 @@
-#ifndef KERNEL_DEV_GENERIC_TIMER_IMPL_H_
-#define KERNEL_DEV_GENERIC_TIMER_IMPL_H_
-
-#include <stdint.h>
-
-#endif  // KERNEL_DEV_GENERIC_TIMER_IMPL_H_

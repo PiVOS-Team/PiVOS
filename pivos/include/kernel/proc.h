@@ -1,37 +1,37 @@
 #ifndef KERNEL_PROC_H_
 #define KERNEL_PROC_H_
 
-#include <kernel/memory.h>
 #include <stdint.h>
+#include <kernel/mem.h>
+#include <kernel/utils.h>
 
-#ifndef KPROC_MAX_COUNT
-#define KPROC_MAX_COUNT 16
+#define PROC_KERNEL_STACK_SIZE 16 * KB_IN_B
+
+enum proc_state {
+    PROC_STATE_FREE,
+    PROC_STATE_NEW,
+    PROC_STATE_READY,
+    PROC_STATE_RUNNING,
+    PROC_STATE_BLOCKED
+};
+
+struct proc {
+    uint16_t PID;
+    enum proc_state state;
+
+    void* k_sp;
+    struct mem_ctx mem_ctx;
+    uint8_t kernel_stack[PROC_KERNEL_STACK_SIZE];
+
+    struct proc* next;
+};
+
+void proc_create_new(struct proc* ctx, uint16_t pid);
+
+void proc_destroy(struct proc* ctx);
+
+void proc_init_ctx(struct proc* ctx, void* sp, void* pc);
+
+void proc_switch(struct proc* curr, struct proc* next);
+
 #endif
-
-#ifndef KPROC_PROG_OFFSET
-#define KPROC_PROG_OFFSET 0x80000ULL
-#endif
-
-struct kproc_suspend_state {
-    uint64_t sp;
-    uint64_t elr;
-    uint64_t general_regs[32];
-};
-
-struct kproc {
-    struct memory_context ctx;
-    struct kproc_suspend_state suspend;
-};
-
-struct kproc_prog_entry {
-    void *text;
-    uint64_t size;
-};
-
-void kproc_exec(uint32_t prog_id);
-
-int32_t kproc_start(uint32_t prog_id, int64_t *rs);
-
-int32_t kproc_exit(int64_t *rs);
-
-#endif  // KERNEL_PROC_H_

@@ -1,5 +1,5 @@
 [constants]
-arch = 'aarch64-linux-gnu'
+arch = 'aarch64-none-elf'
 
 [binaries]
 c = arch + '-gcc'

@@ -1,5 +1,6 @@
 release
 debug
+.cache
 .default_build
 .vscode/launch.json
 .vscode/settings.json

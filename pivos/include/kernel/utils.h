@@ -34,6 +34,24 @@ static inline uint32_t bytecmp(uint8_t* a, uint8_t* b, uint32_t n) {
     return 0;
 }
 
+static inline uint32_t strcmp(const char* a, const char* b) {
+    uint32_t i = 0;
+
+    while(a[i] != '\0' && b[i] != '\0') {
+        if(a[i] != b[i]) {
+            return 1;
+        }
+
+        i++;
+    }
+
+    if(a[i] != '\0' || b[i] != '\0') {
+        return 1;
+    }
+
+    return 0;
+}
+
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define BIT(bit) ((1) << bit)
@@ -46,8 +64,8 @@ static inline uint32_t bytecmp(uint8_t* a, uint8_t* b, uint32_t n) {
 #define GB_IN_B (MB_IN_B * 1024)
 #define TB_IN_B (GB_IN_B * 1024)
 
-#define MMU_ASID_MASK 0xFFFF000000000000ULL
 #define KERNEL_SPACE_MASK 0xFFFF000000000000ULL
+#define ADDRESS_MASK ~KERNEL_SPACE_MASK
 #define PA_TO_KERNEL_VA(ptr) (typeof(ptr))((uint64_t)(ptr) | KERNEL_SPACE_MASK)
 
 #define static_assert(condition, msg) _Static_assert(condition, msg)
