@@ -1,8 +1,8 @@
+#include <kernel/alloc/bitmap.h>
+#include <kernel/arch/mmu.h>
+#include <kernel/config.h>
 #include <kernel/mem.h>
 #include <kernel/utils.h>
-#include <kernel/arch/mmu.h>
-#include <kernel/alloc/bitmap.h>
-#include <kernel/config.h>
 
 #define ALIGN_UP_PAGE(addr) ALIGN_UP(addr, MMU_PAGE_SIZE)
 #define ALIGN_DOWN_PAGE(addr) ALIGN_DOWN(addr, MMU_PAGE_SIZE)
@@ -28,8 +28,7 @@ static void* get_phys_space_one_to_one_and_alloc(struct arch_mmu_space_req* req)
 static void* (*const get_phys_space[3])(struct arch_mmu_space_req* req) = {
     get_phys_space_alloc,
     get_phys_space_one_to_one,
-    get_phys_space_one_to_one_and_alloc
-};
+    get_phys_space_one_to_one_and_alloc};
 
 int32_t mem_init(uint64_t max_allocatable_address) {
     s_max_allocatable_addr = max_allocatable_address;
@@ -38,14 +37,14 @@ int32_t mem_init(uint64_t max_allocatable_address) {
 
     // Setup page allocator
     alloc_bitmap_init((void*)ALIGN_UP_PAGE((uint64_t)&kernel_end), number_of_pages, MMU_PAGE_SIZE);
-    
+
     // Claim kernel region
     alloc_bitmap_claim_range((void*)0, (void*)ALIGN_UP_PAGE(image_size));
 
     // Init mmu
     s_kernel_memory_context = (struct mem_ctx){.table = (uint64_t*)&mmu_space_start};
     arch_mmu_init(alloc_bitmap_claim_pages, alloc_bitmap_free_pages);
-    
+
     return 1;
 }
 

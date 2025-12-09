@@ -1,11 +1,10 @@
 #define UART_PROTECTED_INTERFACE
 
-#include <kernel/device/driver.h>
-#include <kernel/device/dev_event.h>
-#include <kernel/device/irq_controller.h>
-
 #include <drivers/uart/pl011/impl.h>
 #include <drivers/uart/pl011/reg.h>
+#include <kernel/device/dev_event.h>
+#include <kernel/device/driver.h>
+#include <kernel/device/irq_controller.h>
 
 static inline struct uart* pl011_get_regs(struct dev_uart* ctx) {
     return (struct uart*)ctx->config->mem->base;
@@ -15,7 +14,7 @@ static enum irq_handle_status pl011_irq_handler(struct dev* ctx) {
     struct dev_uart* uart_ctx = (struct dev_uart*)ctx;
     struct uart* reg = pl011_get_regs(uart_ctx);
     union uart_mis mis = {.bits = reg->MIS.bits};
-    
+
     if (mis.fields.TXMIS) {
         protected_uart_tx_empty(uart_ctx);
     }
@@ -42,8 +41,7 @@ static int32_t api_pl011_init(struct dev* ctx) {
     struct irq_params params = {
         .target_cpu = IRQ_DEFAULT_CPU,
         .priority = IRQ_PRIORITY_REGULAR,
-        .trigger_type = IRQ_TRIGGER_EDGE
-    };
+        .trigger_type = IRQ_TRIGGER_EDGE};
 
     struct uart* reg = pl011_get_regs(uart_ctx);
 
@@ -126,19 +124,19 @@ static uint8_t api_pl011_try_read_byte(struct dev_uart* ctx, uint8_t* byte) {
     struct uart* reg = pl011_get_regs(ctx);
 
     // Check if there are any bytes left in FIFO
-    if(reg->FR.fields.RXFE) {
+    if (reg->FR.fields.RXFE) {
         return 0;
     }
 
     *byte = reg->DR.fields.DATA;
-    
+
     return 1;
 }
 
 static uint8_t api_pl011_try_write_byte(struct dev_uart* ctx, uint8_t byte) {
     struct uart* reg = pl011_get_regs(ctx);
 
-    if(reg->FR.fields.TXFF) {
+    if (reg->FR.fields.TXFF) {
         return 0;
     }
 
@@ -146,7 +144,7 @@ static uint8_t api_pl011_try_write_byte(struct dev_uart* ctx, uint8_t byte) {
     union uart_dr dr;
     dr.fields.DATA = byte;
     reg->DR.bits = dr.bits;
-    
+
     return 1;
 }
 
@@ -158,7 +156,7 @@ static struct dev_pl011_api pl011_api = {
     .start_tx = api_pl011_start_tx,
     .stop_tx = api_pl011_stop_tx,
     .try_read_byte = api_pl011_try_read_byte,
-    .try_write_byte = api_pl011_try_write_byte
+    .try_write_byte = api_pl011_try_write_byte,
 };
 
 static void drv_pl011_update_ctx(struct dev* ctx) {

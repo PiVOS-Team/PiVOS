@@ -3,11 +3,10 @@
 static dev_event_handler s_handlers[DEV_EVENT__N];
 
 void dev_event_init() {
-
 }
 
 void dev_event_post(struct dev* ctx, enum dev_event event) {
-    if(event >= DEV_EVENT__N || s_handlers[event] == 0) {
+    if (event >= DEV_EVENT__N || s_handlers[event] == 0) {
         return;
     }
 
@@ -15,7 +14,7 @@ void dev_event_post(struct dev* ctx, enum dev_event event) {
 }
 
 void dev_event_register_handler(enum dev_event event, dev_event_handler callback) {
-    if(event >= DEV_EVENT__N || s_handlers[event] != 0) {
+    if (event >= DEV_EVENT__N || s_handlers[event] != 0) {
         return;
     }
 

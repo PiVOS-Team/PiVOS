@@ -1,9 +1,8 @@
 #define IRQ_CONTROLLER_PROTECTED_INTERFACE
 
-#include <kernel/device/driver.h>
-
 #include <drivers/irq_controller/gic/impl.h>
 #include <drivers/irq_controller/gic/reg.h>
+#include <kernel/device/driver.h>
 
 static inline struct gicv2* gicv2_get_regs(struct dev_irq_controller* ctx) {
     return (struct gicv2*)ctx->config->mem->base;
@@ -93,7 +92,7 @@ static void api_gic_toggle_irq(struct dev_irq_controller* ctx, uint16_t irq_numb
     uint32_t shift = irq_number % 32;
     uint32_t new_val = 1 << shift;
 
-    if(state == 1) {
+    if (state == 1) {
         gicv2->GICD.ISENABLER[reg].bits = new_val;
     } else {
         gicv2->GICD.ICENABLER[reg].bits = new_val;
@@ -123,7 +122,7 @@ static struct dev_gic_api gic_api = {
     .toggle_irq = api_gic_toggle_irq,
     .end_of_interrupt = api_gic_end_of_interrupt,
     .get_pending_irq = api_gic_get_pending_irq,
-    .get_max_irq = api_gic_get_max_irq
+    .get_max_irq = api_gic_get_max_irq,
 };
 
 static void drv_gic_update_ctx(struct dev* ctx) {

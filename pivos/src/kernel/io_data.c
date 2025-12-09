@@ -1,5 +1,5 @@
-#include <kernel/io_data.h>
 #include <kernel/buffer/ring.h>
+#include <kernel/io_data.h>
 
 #define BUFFER_DATA_SIZE 4096
 

@@ -60,8 +60,7 @@ static void bitmap_free_multiple_pages(uint32_t page_number, uint32_t count) {
     }
 }
 
-
-void alloc_bitmap_init(void *addr, uint32_t number_of_pages, uint32_t page_size) {
+void alloc_bitmap_init(void* addr, uint32_t number_of_pages, uint32_t page_size) {
     ASSERT(LOW, (uint64_t)addr % page_size == 0, "Bitmap address must be aligned to page size");
 
     s_page_size = page_size;
@@ -73,7 +72,6 @@ void alloc_bitmap_init(void *addr, uint32_t number_of_pages, uint32_t page_size)
     uint64_t bitmap_end = (uint64_t)s_bitmap + s_bitmap_entry_count * sizeof(uint64_t);
     alloc_bitmap_claim_range(s_bitmap, (void*)ALIGN_UP(bitmap_end, s_page_size));
 }
-
 
 void* alloc_bitmap_claim_page() {
     uint64_t current_entry = 0;
@@ -102,13 +100,12 @@ void* alloc_bitmap_claim_page() {
     return NULL;
 }
 
-void alloc_bitmap_free_page(void *addr) {
+void alloc_bitmap_free_page(void* addr) {
     ASSERT(HIGH, (uint64_t)addr % s_page_size == 0, "Addres must be aligned");
 
     uint32_t page_number = bitmap_get_page_number((uint64_t)addr);
     bitmap_free_specific_page(page_number);
 }
-
 
 void* alloc_bitmap_claim_pages(uint32_t number, uint32_t align) {
     if (number == 1 && align == 1) {
@@ -155,15 +152,14 @@ void* alloc_bitmap_claim_pages(uint32_t number, uint32_t align) {
     return NULL;
 }
 
-void alloc_bitmap_free_pages(void *addr, uint32_t number) {
+void alloc_bitmap_free_pages(void* addr, uint32_t number) {
     ASSERT(HIGH, (uint64_t)addr % s_page_size == 0, "Addres must be aligned");
 
     uint32_t from_page = bitmap_get_page_number((uint64_t)addr);
     bitmap_free_multiple_pages(from_page, number);
 }
 
-
-void alloc_bitmap_claim_range(void *from, void *to) {
+void alloc_bitmap_claim_range(void* from, void* to) {
     ASSERT(HIGH, (uint64_t)from % s_page_size == 0 && (uint64_t)to % s_page_size == 0, "Addres must be aligned");
 
     uint32_t from_page = bitmap_get_page_number((uint64_t)from);
@@ -177,7 +173,7 @@ void alloc_bitmap_claim_range(void *from, void *to) {
     bitmap_claim_multiple_pages(from_page, pages_to_claim);
 }
 
-void alloc_bitmap_free_range(void *from, void *to) {
+void alloc_bitmap_free_range(void* from, void* to) {
     ASSERT(HIGH, (uint64_t)from % s_page_size == 0 && (uint64_t)to % s_page_size == 0, "Addres must be aligned");
 
     uint32_t from_page = bitmap_get_page_number((uint64_t)from);

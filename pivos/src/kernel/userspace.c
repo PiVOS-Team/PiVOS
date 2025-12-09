@@ -1,16 +1,16 @@
-#include <kernel/userspace.h>
-#include <kernel/syscall.h>
-#include <kernel/sched.h>
-#include <kernel/proc.h>
-#include <kernel/mem.h>
-#include <kernel/device.h>
-#include <kernel/config.h>
 #include <kernel/arch/cpu.h>
-#include <kernel/io_data.h>
-#include <kernel/loader.h>
-#include <kernel/utils.h>
-#include <kernel/irq.h>
 #include <kernel/buffer/ring.h>
+#include <kernel/config.h>
+#include <kernel/device.h>
+#include <kernel/io_data.h>
+#include <kernel/irq.h>
+#include <kernel/loader.h>
+#include <kernel/mem.h>
+#include <kernel/proc.h>
+#include <kernel/sched.h>
+#include <kernel/syscall.h>
+#include <kernel/userspace.h>
+#include <kernel/utils.h>
 
 #define MAX_PROC 128
 
@@ -23,10 +23,10 @@ static uint32_t ticks;
 
 static struct proc* get_new_proc() {
     struct proc* curr_proc = NULL;
-    
-    for(uint16_t i = 0; i < MAX_PROC; i++) {
+
+    for (uint16_t i = 0; i < MAX_PROC; i++) {
         curr_proc = &s_proc[i];
-        if(curr_proc->state == PROC_STATE_FREE) {
+        if (curr_proc->state == PROC_STATE_FREE) {
             return curr_proc;
         }
     }
@@ -35,7 +35,7 @@ static struct proc* get_new_proc() {
 }
 
 static void userspace_irq_post_handler() {
-    if(s_need_reschedule) {
+    if (s_need_reschedule) {
         s_need_reschedule = 0;
         sched_reschedule();
     }
@@ -43,7 +43,7 @@ static void userspace_irq_post_handler() {
 
 static void userspace_timer_tick_event_handler(struct dev* ctx) {
     struct dev_timer* timer_ctx = (struct dev_timer*)ctx;
-    if(timer_ctx != s_sys_timer) {
+    if (timer_ctx != s_sys_timer) {
         return;
     }
 
@@ -55,17 +55,15 @@ static void syscall_write(int64_t* args) {
     uint8_t* ptr = (uint8_t*)args[0];
     uint16_t len = args[1];
 
-    if(kbuffer_ring_available(s_out_buffer) < len) {
+    if (kbuffer_ring_available(s_out_buffer) < len) {
         return;
     }
 
-    for(uint64_t i = 0; i < len; i++) {
-        
-
+    for (uint64_t i = 0; i < len; i++) {
         kbuffer_ring_write(s_out_buffer, ptr[i]);
     }
 
-    if(!uart_get_tx_state(s_console)) {
+    if (!uart_get_tx_state(s_console)) {
         uart_toggle_tx(s_console, 1);
     }
 
@@ -82,7 +80,7 @@ static void userspace_register_syscalls() {
 }
 
 int32_t userspace_init(struct dev_uart* console, struct dev_timer* sys_timer) {
-    if(!syscall_init()) {
+    if (!syscall_init()) {
         return 0;
     }
 
@@ -129,10 +127,10 @@ void userspace_start() {
     p1->state = PROC_STATE_RUNNING;
     sched_init(10, p1);
     timer_start(s_sys_timer);
-    
+
     arch_cpu_switch_context(&temp, &p1->k_sp);
 
-    while(1) {
+    while (1) {
         arch_cpu_halt();
     }
 }

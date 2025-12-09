@@ -1,9 +1,7 @@
-#include <kernel/panic.h>
-#include <kernel/irq.h>
-#include <kernel/syscall.h>
-
 #include <arch/arm64/int.h>
-
+#include <kernel/irq.h>
+#include <kernel/panic.h>
+#include <kernel/syscall.h>
 #include <stddef.h>
 
 static void int_not_implemented() {

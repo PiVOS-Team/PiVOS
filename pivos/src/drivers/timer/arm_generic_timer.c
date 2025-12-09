@@ -1,11 +1,10 @@
 #define TIMER_PROTECTED_INTERFACE
 
-#include <kernel/device/driver.h>
-#include <kernel/device/dev_event.h>
-#include <kernel/device/irq_controller.h>
-
 #include <drivers/timer/arm_generic_timer/impl.h>
 #include <drivers/timer/arm_generic_timer/reg.h>
+#include <kernel/device/dev_event.h>
+#include <kernel/device/driver.h>
+#include <kernel/device/irq_controller.h>
 
 static inline void generic_timer_set_interval(uint16_t interval) {
     union cntp_tval_el0_t tval;
@@ -34,7 +33,7 @@ static enum irq_handle_status generic_timer_irq_handler(struct dev* ctx) {
 
     generic_timer_set_interval(timer_ctx->data->interval);
     generic_timer_toggle(1);
-    
+
     return IRQ_HANDLED;
 }
 
@@ -48,8 +47,7 @@ static int32_t api_generic_timer_init(struct dev* ctx) {
     struct irq_params params = {
         .target_cpu = IRQ_DEFAULT_CPU,
         .priority = IRQ_PRIORITY_REGULAR,
-        .trigger_type = IRQ_TRIGGER_EDGE
-    };
+        .trigger_type = IRQ_TRIGGER_EDGE};
 
     uint16_t irq_number = generic_timer_ctx->config->irq_number;
     irq_controller_register(irq_ctrl, irq_number, &params, generic_timer_irq_handler, ctx);
@@ -79,7 +77,7 @@ static struct dev_generic_timer_api generic_timer_api = {
     .destroy = api_generic_timer_destroy,
     .start = api_generic_timer_start,
     .stop = api_generic_timer_stop,
-    .update_interval = api_generic_timer_update_interval
+    .update_interval = api_generic_timer_update_interval,
 };
 
 static void generic_timer_update_ctx(struct dev* ctx) {

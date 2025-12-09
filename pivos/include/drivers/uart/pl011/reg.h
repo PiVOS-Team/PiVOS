@@ -1,8 +1,8 @@
 #ifndef DRIVERS_UART_PL011_REG_H_
 #define DRIVERS_UART_PL011_REG_H_
 
-#include <stdint.h>
 #include <kernel/utils.h>
+#include <stdint.h>
 
 union uart_dr {
     volatile uint32_t bits;

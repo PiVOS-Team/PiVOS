@@ -5,7 +5,7 @@
 extern char stack_bottom;
 extern char stack_top;
 
-void assert_check(uint8_t condition_result, char *message) {
+void assert_check(uint8_t condition_result, char* message) {
     if (condition_result) {
         return;
     }
@@ -16,11 +16,11 @@ void assert_check(uint8_t condition_result, char *message) {
     uint64_t base_addr = (uint64_t)&stack_bottom;
 
     while (message[i] != '\0' && i != max_length) {
-        *(uint8_t *)(base_addr + i + sizeof(uint32_t)) = message[i];
+        *(uint8_t*)(base_addr + i + sizeof(uint32_t)) = message[i];
         i++;
     }
 
-    *(uint32_t *)base_addr = i;
+    *(uint32_t*)base_addr = i;
 
     while (1) {
     }

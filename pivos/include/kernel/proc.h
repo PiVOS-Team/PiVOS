@@ -1,9 +1,9 @@
 #ifndef KERNEL_PROC_H_
 #define KERNEL_PROC_H_
 
-#include <stdint.h>
 #include <kernel/mem.h>
 #include <kernel/utils.h>
+#include <stdint.h>
 
 #define PROC_KERNEL_STACK_SIZE 16 * KB_IN_B
 

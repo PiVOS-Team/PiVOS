@@ -25,7 +25,7 @@
 
 extern void vector_table();
 
-#define INT_ISR_PROTYPE(name) void int_##name##_isr(int64_t *);
+#define INT_ISR_PROTYPE(name) void int_##name##_isr(int64_t*);
 INT_LIST(INT_ISR_PROTYPE)
 #undef INT_ISR_PROTYPE
 

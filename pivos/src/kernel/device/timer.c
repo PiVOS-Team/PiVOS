@@ -1,13 +1,13 @@
 #define DEV_PROTECTED_INTERFACE
 #define TIMER_PROTECTED_INTERFACE
 
-#include <kernel/device/timer.h>
 #include <kernel/device/dev_event.h>
+#include <kernel/device/timer.h>
 
 int32_t protected_timer_init(struct dev_timer* ctx) {
     // Call base init
     int32_t res = protected_dev_init((struct dev*)ctx);
-    
+
     ctx->data->interval = 0;
     ctx->data->total_time = 0;
     ctx->data->is_running = 0;
@@ -22,15 +22,15 @@ void protected_timer_tick(struct dev_timer* ctx) {
 }
 
 void timer_start(struct dev_timer* ctx) {
-    if(ctx->data->is_running == 1) {
+    if (ctx->data->is_running == 1) {
         return;
     }
-    
+
     ctx->api->start(ctx);
 }
 
 void timer_stop(struct dev_timer* ctx) {
-    if(ctx->data->is_running == 0) {
+    if (ctx->data->is_running == 0) {
         return;
     }
 
@@ -40,7 +40,7 @@ void timer_stop(struct dev_timer* ctx) {
 void timer_set_interval(struct dev_timer* ctx, uint16_t count) {
     ctx->data->interval = count;
 
-    if(ctx->data->is_running) {
+    if (ctx->data->is_running) {
         ctx->api->stop(ctx);
         ctx->api->update_interval(ctx);
         ctx->api->start(ctx);

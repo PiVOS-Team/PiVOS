@@ -14,7 +14,7 @@ void irq_register_post_handler(irq_post_handler callback) {
 void irq_dispatch() {
     irq_controller_dispatch(s_main_controller);
 
-    if(s_post_handler) {
+    if (s_post_handler) {
         s_post_handler();
     }
 }

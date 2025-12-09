@@ -6,17 +6,16 @@
 #define DEV_timer_CONFIG_FIELDS \
     DEV_dev_CONFIG_FIELDS
 
-#define DEV_timer_API_FIELDS                                    \
-    DEV_dev_API_FIELDS                                          \
-    void (*start)(struct dev_timer* ctx);                       \
-    void (*stop)(struct dev_timer* ctx);                        \
-    void (*update_interval)(struct dev_timer* ctx);
+#define DEV_timer_API_FIELDS                                  \
+    DEV_dev_API_FIELDS void (*start)(struct dev_timer * ctx); \
+    void (*stop)(struct dev_timer * ctx);                     \
+    void (*update_interval)(struct dev_timer * ctx);
 
-#define DEV_timer_DATA_FIELDS   \
-    DEV_dev_DATA_FIELDS         \
-    uint16_t interval;          \
-    uint16_t total_time;        \
-    volatile uint8_t is_running;\
+#define DEV_timer_DATA_FIELDS \
+    DEV_dev_DATA_FIELDS       \
+        uint16_t interval;    \
+    uint16_t total_time;      \
+    volatile uint8_t is_running;
 
 DEV_DEFINE_NEW(timer)
 

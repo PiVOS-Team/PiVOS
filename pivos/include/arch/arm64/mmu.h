@@ -1,7 +1,7 @@
 #ifndef ARCH_ARM64_MMU_H_
 #define ARCH_ARM64_MMU_H_
 
-#define ARM64_MMU_GRANULE_SIZE_4KB 
+#define ARM64_MMU_GRANULE_SIZE_4KB
 
 //------------------------------------------- MAIR_EL1 -------------------------------------------
 
@@ -9,7 +9,7 @@
 #define MAIR_MEMORY_DEVICE 1
 
 #define MAIR_CREATE_ATTRIBUTE(upper, lower) (((upper) << 4) | (lower))
-#define MAIR_CREATE_MEMORY_PROFILE(index, attribute) ((attribute) << ((index) * 8)) 
+#define MAIR_CREATE_MEMORY_PROFILE(index, attribute) ((attribute) << ((index) * 8))
 //-------------------------------------------
 // Attr<n>[7:4]
 // R - Outer Read-Allocate policy
@@ -102,40 +102,35 @@
 #define TCR_AS_8bit 0
 #define TCR_AS_16bit 1
 
-#define TCR_VALUE (                                                     \
-    TCR_T0SZ                                    << TCR_FIELD_T0SZ |     \
-    TCR_IRGN_NORMAL_MEMORY_INNER_NON_CACHEABLE  << TCR_FIELD_IRGN0 |    \
-    TCR_ORGN_NORMAL_MEMORY_OUTER_NON_CACHEABLE  << TCR_FIELD_ORGN0 |    \
-    TCR_SH_NON_SHAREABLE                        << TCR_FIELD_SH0 |      \
-    TCR_TG0_GRANULE_4KB                         << TCR_FIELD_TG0 |      \
-    TCR_T1SZ                                    << TCR_FIELD_T1SZ |     \
-    TCR_A1_TTBR0_DEFINE_ASID                    << TCR_FIELD_A1 |       \
-    TCR_IRGN_NORMAL_MEMORY_INNER_NON_CACHEABLE  << TCR_FIELD_IRGN1 |    \
-    TCR_ORGN_NORMAL_MEMORY_OUTER_NON_CACHEABLE  << TCR_FIELD_ORGN1 |    \
-    TCR_SH_NON_SHAREABLE                        << TCR_FIELD_SH1 |      \
-    TCR_TG1_GRANULE_4KB                         << TCR_FIELD_TG1 |      \
-    TCR_IPS_32bit_4GB                           << TCR_FIELD_IPS |      \
-    TCR_AS_16bit                                << TCR_FIELD_AS         \
-)
+#define TCR_VALUE (                                                 \
+    TCR_T0SZ << TCR_FIELD_T0SZ |                                    \
+    TCR_IRGN_NORMAL_MEMORY_INNER_NON_CACHEABLE << TCR_FIELD_IRGN0 | \
+    TCR_ORGN_NORMAL_MEMORY_OUTER_NON_CACHEABLE << TCR_FIELD_ORGN0 | \
+    TCR_SH_NON_SHAREABLE << TCR_FIELD_SH0 |                         \
+    TCR_TG0_GRANULE_4KB << TCR_FIELD_TG0 |                          \
+    TCR_T1SZ << TCR_FIELD_T1SZ |                                    \
+    TCR_A1_TTBR0_DEFINE_ASID << TCR_FIELD_A1 |                      \
+    TCR_IRGN_NORMAL_MEMORY_INNER_NON_CACHEABLE << TCR_FIELD_IRGN1 | \
+    TCR_ORGN_NORMAL_MEMORY_OUTER_NON_CACHEABLE << TCR_FIELD_ORGN1 | \
+    TCR_SH_NON_SHAREABLE << TCR_FIELD_SH1 |                         \
+    TCR_TG1_GRANULE_4KB << TCR_FIELD_TG1 |                          \
+    TCR_IPS_32bit_4GB << TCR_FIELD_IPS |                            \
+    TCR_AS_16bit << TCR_FIELD_AS)
 
-#define MAIR_VALUE (                                                                                            \
-    MAIR_CREATE_MEMORY_PROFILE(                                                                                 \
-        MAIR_MEMORY_NORMAL_NO_CACHE,                                                                            \
-        MAIR_CREATE_ATTRIBUTE(MAIR_NORMAL_MEMORY_OUTER_NON_CACHEABLE, MAIR_NORMAL_MEMORY_INNER_NON_CACHEABLE)   \
-    ) |                                                                                                         \
-    MAIR_CREATE_MEMORY_PROFILE(                                                                                 \
-        MAIR_MEMORY_DEVICE,                                                                                     \
-        MAIR_CREATE_ATTRIBUTE(MAIR_DEVICE_MEMORY, MAIR_DEVICE_nGnRnE)                                           \
-    )                                                                                                           \
-)
+#define MAIR_VALUE (                                                                                             \
+    MAIR_CREATE_MEMORY_PROFILE(                                                                                  \
+        MAIR_MEMORY_NORMAL_NO_CACHE,                                                                             \
+        MAIR_CREATE_ATTRIBUTE(MAIR_NORMAL_MEMORY_OUTER_NON_CACHEABLE, MAIR_NORMAL_MEMORY_INNER_NON_CACHEABLE)) | \
+    MAIR_CREATE_MEMORY_PROFILE(                                                                                  \
+        MAIR_MEMORY_DEVICE,                                                                                      \
+        MAIR_CREATE_ATTRIBUTE(MAIR_DEVICE_MEMORY, MAIR_DEVICE_nGnRnE)))
 
 #define MMU_TABLE_VALID_FLAG 0
 #define MMU_TABLE_ACCESS_FLAG 10
 
-#define MMU_TABLE_ATTR (            \
-    1 << MMU_TABLE_VALID_FLAG |     \
-    1 << MMU_TABLE_ACCESS_FLAG      \
-)
+#define MMU_TABLE_ATTR (        \
+    1 << MMU_TABLE_VALID_FLAG | \
+    1 << MMU_TABLE_ACCESS_FLAG)
 
 #define MMU_TYPE_MASK 0b11
 #define MMU_ENTRY_VALID_MASK 0b01
@@ -148,9 +143,9 @@
 
 #ifndef __ASSEMBLER__
 
-#include <stdint.h>
-#include <kernel/utils.h>
 #include <kernel/arch/mmu.h>
+#include <kernel/utils.h>
+#include <stdint.h>
 
 #if MMU_PAGE_SIZE == (KB_IN_B * 4)
 
@@ -218,8 +213,7 @@ union mmu_table_entry {
 
 static const uint64_t mmu_number_of_level_entries[4] = {512, 512, 512, 512};
 
-static const uint64_t mmu_size_of_level_region[4] = {GB_IN_B * 512, GB_IN_B * 1,
-                                                     MB_IN_B * 2, KB_IN_B * 4};
+static const uint64_t mmu_size_of_level_region[4] = {GB_IN_B * 512, GB_IN_B * 1, MB_IN_B * 2, KB_IN_B * 4};
 
 #elif MMU_PAGE_SIZE == (KB_IN_B * 16)
 #error "MMU: 16KB page size is currently unsupported"

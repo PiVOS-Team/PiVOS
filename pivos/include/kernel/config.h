@@ -1,11 +1,11 @@
 #ifndef KERNEL_CONFIG_H_
 #define KERNEL_CONFIG_H_
 
-#include <kernel/mem.h>
 #include <kernel/device/dev.h>
-#include <kernel/device/uart.h>
 #include <kernel/device/irq_controller.h>
 #include <kernel/device/timer.h>
+#include <kernel/device/uart.h>
+#include <kernel/mem.h>
 
 struct config_selected_dev {
     struct dev_uart* console;

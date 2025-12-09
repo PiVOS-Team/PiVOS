@@ -18,13 +18,13 @@ int32_t protected_irq_controller_init(struct dev_irq_controller* ctx) {
 int32_t irq_controller_register(struct dev_irq_controller* ctx, uint16_t irq_number, struct irq_params* params, irq_handler handler, struct dev* sender) {
     uint16_t supported_irqs = ctx->data->dispatchers_count;
 
-    if(irq_number > supported_irqs) {
+    if (irq_number > supported_irqs) {
         return 0;
     }
 
     struct irq_dispatch_entry* entry = &ctx->data->dispatchers[irq_number];
 
-    if(entry->handler != NULL) {
+    if (entry->handler != NULL) {
         return 0;
     }
 
@@ -32,7 +32,7 @@ int32_t irq_controller_register(struct dev_irq_controller* ctx, uint16_t irq_num
     entry->sender = sender;
 
     ctx->api->setup_irq(ctx, irq_number, params);
-    
+
     return 1;
 }
 

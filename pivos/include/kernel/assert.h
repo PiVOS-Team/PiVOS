@@ -17,7 +17,7 @@
 
 #ifdef DEBUG
 
-void assert_check(uint8_t condition_result, char *message);
+void assert_check(uint8_t condition_result, char* message);
 
 #define ASSERT_BASE(condition, message) assert_check((condition), (message))
 

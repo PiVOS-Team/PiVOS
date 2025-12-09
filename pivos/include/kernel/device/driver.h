@@ -8,8 +8,7 @@
         .name = #drv_name,                                                              \
         .bus_type = drv_bus_type,                                                       \
         .dev_type = drv_dev_type,                                                       \
-        .update_ctx = drv_update_ctx_callback                                           \
-    };                                                                                  \
+        .update_ctx = drv_update_ctx_callback};                                         \
     static struct drv* __driver_##drv_name __attribute__((section(".drivers"), used)) = &_driver_##drv_name;
 
 struct drv {

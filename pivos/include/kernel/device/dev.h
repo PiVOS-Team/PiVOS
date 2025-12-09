@@ -3,55 +3,54 @@
 
 #include <stdint.h>
 
-#define _DEV_BASE_FIELDS                        \
-    const char* name;                           \
-    enum dev_type type;                         \
-    enum bus_type bus_connection;               \
+#define _DEV_BASE_FIELDS          \
+    const char* name;             \
+    enum dev_type type;           \
+    enum bus_type bus_connection; \
     enum dev_status status;
 
-#define _DEV_FIELDS(name)                       \
-    struct dev_##name##_config* config;         \
-    struct dev_##name##_api* api;               \
+#define _DEV_FIELDS(name)               \
+    struct dev_##name##_config* config; \
+    struct dev_##name##_api* api;       \
     struct dev_##name##_data* data;
 
-#define _DEV_DEFINE_STRUCT(name, fields)        \
-    struct dev_##name {                         \
-        fields                                  \
+#define _DEV_DEFINE_STRUCT(name, fields) \
+    struct dev_##name {                  \
+        fields                           \
     };
 
-#define _DEV_DEFINE_STRUCT_AND_INHERIT(name, fields, inherit_fields)\
-    struct dev_##name {                                             \
-        inherit_fields                                              \
-        fields                                                      \
+#define _DEV_DEFINE_STRUCT_AND_INHERIT(name, fields, inherit_fields) \
+    struct dev_##name {                                              \
+        inherit_fields                                               \
+            fields                                                   \
     };
 
-#define _DEV_DEFINE_CONFIG(name, fields)        \
+#define _DEV_DEFINE_CONFIG(name, fields) \
     _DEV_DEFINE_STRUCT(name##_config, fields)
 
-#define _DEV_DEFINE_API(name, fields)           \
+#define _DEV_DEFINE_API(name, fields) \
     _DEV_DEFINE_STRUCT(name##_api, fields)
 
-#define _DEV_DEFINE_DATA(name, fields)          \
+#define _DEV_DEFINE_DATA(name, fields) \
     _DEV_DEFINE_STRUCT(name##_data, fields)
 
 #define _DEV_DEFINE_HEADER(name) \
     struct dev_##name;
 
-#define DEV_DEFINE_NEW(name)                                    \
-    struct dev_##name;                                          \
-    _DEV_DEFINE_CONFIG(name, DEV_##name##_CONFIG_FIELDS)        \
-    _DEV_DEFINE_API(name, DEV_##name##_API_FIELDS)              \
-    _DEV_DEFINE_DATA(name, DEV_##name##_DATA_FIELDS)            \
+#define DEV_DEFINE_NEW(name)                             \
+    struct dev_##name;                                   \
+    _DEV_DEFINE_CONFIG(name, DEV_##name##_CONFIG_FIELDS) \
+    _DEV_DEFINE_API(name, DEV_##name##_API_FIELDS)       \
+    _DEV_DEFINE_DATA(name, DEV_##name##_DATA_FIELDS)     \
     _DEV_DEFINE_STRUCT_AND_INHERIT(name, _DEV_FIELDS(name), _DEV_BASE_FIELDS)
 
+#define DEV_dev_CONFIG_FIELDS                  \
+    struct dev_irq_controller* irq_controller; \
+    struct dev_mem_reg* mem;
 
-#define DEV_dev_CONFIG_FIELDS                   \
-     struct dev_irq_controller* irq_controller; \
-     struct dev_mem_reg* mem;
-
-#define DEV_dev_API_FIELDS                      \
-    int32_t (*init)(struct dev* ctx);           \
-    int32_t (*destroy)(struct dev* ctx);        
+#define DEV_dev_API_FIELDS             \
+    int32_t (*init)(struct dev * ctx); \
+    int32_t (*destroy)(struct dev * ctx);
 
 #define DEV_dev_DATA_FIELDS
 
@@ -110,7 +109,6 @@ struct dev {
 int32_t protected_dev_init(struct dev* ctx);
 
 #endif
-
 
 int32_t dev_init(struct dev* ctx);
 

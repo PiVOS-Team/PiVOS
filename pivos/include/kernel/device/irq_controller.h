@@ -36,22 +36,19 @@ struct irq_dispatch_entry {
     struct dev* sender;
 };
 
-
-#define DEV_irq_controller_CONFIG_FIELDS    \
+#define DEV_irq_controller_CONFIG_FIELDS \
     DEV_dev_CONFIG_FIELDS
 
-#define DEV_irq_controller_API_FIELDS                                                                   \
-    DEV_dev_API_FIELDS                                                                                  \
-    void (*setup_irq)(struct dev_irq_controller* ctx, uint16_t irq_number, struct irq_params* params);   \
-    void (*toggle_irq)(struct dev_irq_controller* ctx, uint16_t irq_number, uint8_t state);             \
-    void (*end_of_interrupt)(struct dev_irq_controller* ctx, uint16_t irq_number);                      \
-    uint16_t (*get_pending_irq)(struct dev_irq_controller* ctx);                                        \
-    uint16_t (*get_max_irq)(struct dev_irq_controller* ctx);
+#define DEV_irq_controller_API_FIELDS                                                                                      \
+    DEV_dev_API_FIELDS void (*setup_irq)(struct dev_irq_controller * ctx, uint16_t irq_number, struct irq_params* params); \
+    void (*toggle_irq)(struct dev_irq_controller * ctx, uint16_t irq_number, uint8_t state);                               \
+    void (*end_of_interrupt)(struct dev_irq_controller * ctx, uint16_t irq_number);                                        \
+    uint16_t (*get_pending_irq)(struct dev_irq_controller * ctx);                                                          \
+    uint16_t (*get_max_irq)(struct dev_irq_controller * ctx);
 
-#define DEV_irq_controller_DATA_FIELDS      \
-    DEV_dev_DATA_FIELDS                     \
-    struct irq_dispatch_entry* dispatchers; \
-    uint16_t dispatchers_count;             \
+#define DEV_irq_controller_DATA_FIELDS                          \
+    DEV_dev_DATA_FIELDS struct irq_dispatch_entry* dispatchers; \
+    uint16_t dispatchers_count;
 
 DEV_DEFINE_NEW(irq_controller)
 

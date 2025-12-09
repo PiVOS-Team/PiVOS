@@ -3,6 +3,8 @@ IndentWidth: 4
 UseTab: Never
 Language: Cpp
 BasedOnStyle: Google
+ColumnLimit: 0
+BinPackArguments: false
 
 Standard: Auto
 AlignConsecutiveBitFields: true

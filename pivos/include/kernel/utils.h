@@ -37,15 +37,15 @@ static inline uint32_t bytecmp(uint8_t* a, uint8_t* b, uint32_t n) {
 static inline uint32_t strcmp(const char* a, const char* b) {
     uint32_t i = 0;
 
-    while(a[i] != '\0' && b[i] != '\0') {
-        if(a[i] != b[i]) {
+    while (a[i] != '\0' && b[i] != '\0') {
+        if (a[i] != b[i]) {
             return 1;
         }
 
         i++;
     }
 
-    if(a[i] != '\0' || b[i] != '\0') {
+    if (a[i] != '\0' || b[i] != '\0') {
         return 1;
     }
 

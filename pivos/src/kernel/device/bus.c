@@ -8,6 +8,6 @@ int32_t protected_bus_init(struct dev_bus* ctx) {
     return protected_dev_init((struct dev*)ctx);
 }
 
-void bus_search(struct dev_bus *ctx) {
+void bus_search(struct dev_bus* ctx) {
     ctx->api->search(ctx);
 }

@@ -3,15 +3,14 @@
 
 #include <kernel/device/dev.h>
 
-#define DEV_bus_CONFIG_FIELDS   \
+#define DEV_bus_CONFIG_FIELDS \
     DEV_dev_CONFIG_FIELDS
 
-#define DEV_bus_API_FIELDS                  \
-    DEV_dev_API_FIELDS                      \
-    void (*search)(struct dev_bus* ctx);
+#define DEV_bus_API_FIELDS \
+    DEV_dev_API_FIELDS void (*search)(struct dev_bus * ctx);
 
-#define DEV_bus_DATA_FIELDS     \
-    DEV_dev_DATA_FIELDS         
+#define DEV_bus_DATA_FIELDS \
+    DEV_dev_DATA_FIELDS
 
 DEV_DEFINE_NEW(bus)
 

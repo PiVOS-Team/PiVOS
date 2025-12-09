@@ -1,7 +1,8 @@
 #include <kernel/sched.h>
+#include <kernel/utils.h>
+
 #include "kernel/arch/cpu.h"
 #include "kernel/proc.h"
-#include <kernel/utils.h>
 
 static uint16_t s_quantum;
 static uint16_t s_tick_left;
@@ -11,14 +12,14 @@ static struct proc* s_ready_head;
 static struct proc* s_ready_tail;
 
 static struct proc* sched_pick_next() {
-    if(!s_ready_head) {
+    if (!s_ready_head) {
         return NULL;
     }
 
     struct proc* proc = s_ready_head;
     s_ready_head = s_ready_head->next;
 
-    if(!s_ready_head) {
+    if (!s_ready_head) {
         s_ready_tail = NULL;
     }
 
@@ -34,10 +35,10 @@ int32_t sched_init(uint16_t quantum, struct proc* first_proc) {
 }
 
 void sched_add_ready(struct proc* proc) {
-    proc->state = PROC_STATE_READY;    
+    proc->state = PROC_STATE_READY;
     proc->next = NULL;
 
-    if(!s_ready_head) {
+    if (!s_ready_head) {
         s_ready_head = proc;
         s_ready_tail = proc;
     } else {
@@ -47,27 +48,26 @@ void sched_add_ready(struct proc* proc) {
 }
 
 void sched_remove_ready(struct proc* proc) {
-
 }
 
 void sched_reschedule() {
     struct proc* curr = s_current_proc;
     struct proc* next = NULL;
 
-    if(curr->state == PROC_STATE_RUNNING) {
+    if (curr->state == PROC_STATE_RUNNING) {
         sched_add_ready(curr);
     }
 
     next = sched_pick_next();
 
-    while(!next) {
+    while (!next) {
         // Wait for any ready process
         arch_cpu_halt();
         next = sched_pick_next();
     }
 
     // If there is only one proc in queue
-    if(curr == next) {
+    if (curr == next) {
         curr->state = PROC_STATE_RUNNING;
         s_tick_left = s_quantum;
         return;

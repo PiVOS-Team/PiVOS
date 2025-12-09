@@ -1,24 +1,24 @@
 #include <kernel/config.h>
-#include <kernel/mem.h>
 #include <kernel/device.h>
+#include <kernel/mem.h>
 #include <kernel/utils.h>
 
 #if defined(TARGET_RPI_4B)
 
 #include <drivers/irq_controller/gic/impl.h>
-#include <drivers/uart/pl011/impl.h>
 #include <drivers/timer/arm_generic_timer/impl.h>
+#include <drivers/uart/pl011/impl.h>
 
 static struct mem_reg mem_reg_dram0 = {
     .base = 0,
     .size = 0xfc000000,
-    .mem_type = MEM_TYPE_NORMAL_NO_CACHE
+    .mem_type = MEM_TYPE_NORMAL_NO_CACHE,
 };
 
 static struct mem_reg mem_reg_dram1 = {
     .base = 0xfc000000,
     .size = 0x100000000 - 0xfc000000,
-    .mem_type = MEM_TYPE_DEVICE
+    .mem_type = MEM_TYPE_DEVICE,
 };
 
 static struct mem_reg* mem_regs[] = {
@@ -31,19 +31,17 @@ static struct dev_gic gic = {
     .type = DEV_TYPE_IRQ_CONTROLLER,
     .bus_connection = BUS_TYPE_MMIO,
     .status = DEV_STATUS_NEW,
-    
+
     .api = NULL,
-    .data = &(struct dev_gic_data) {},
-    
-    .config = &(struct dev_gic_config) {
+    .data = &(struct dev_gic_data){},
+
+    .config = &(struct dev_gic_config){
         .irq_controller = NULL,
         .version = 2,
         .mem = &(struct dev_mem_reg){
             .base = 0xFF840000 + 0xFFFF000000000000ULL,
-            .size = 0x0
-        }
-    }
-};
+            .size = 0x0,
+        }}};
 
 static struct dev_pl011 uart0 = {
     .name = "pl011",
@@ -52,17 +50,15 @@ static struct dev_pl011 uart0 = {
     .status = DEV_STATUS_NEW,
 
     .api = NULL,
-    .data = &(struct dev_pl011_data) {},
+    .data = &(struct dev_pl011_data){},
 
-    .config = &(struct dev_pl011_config) {
+    .config = &(struct dev_pl011_config){
         .irq_controller = (struct dev_irq_controller*)&gic,
         .irq_number = 153,
-        .mem = &(struct dev_mem_reg) {
+        .mem = &(struct dev_mem_reg){
             .base = 0xfe201000UL + 0xFFFF000000000000ULL,
-            .size = 0x0
-        }
-    }
-};
+            .size = 0x0,
+        }}};
 
 static struct dev_generic_timer arm_generic_timer = {
     .name = "generic_timer",
@@ -71,25 +67,23 @@ static struct dev_generic_timer arm_generic_timer = {
     .status = DEV_STATUS_NEW,
 
     .api = NULL,
-    .data = &(struct dev_generic_timer_data) {},
+    .data = &(struct dev_generic_timer_data){},
 
-    .config = &(struct dev_generic_timer_config) {
+    .config = &(struct dev_generic_timer_config){
         .irq_controller = (struct dev_irq_controller*)&gic,
         .irq_number = 30,
-        .mem = NULL
-    }
-};
+        .mem = NULL,
+    }};
 
 static struct dev* devs[] = {
     (struct dev*)&gic,
     (struct dev*)&uart0,
-    (struct dev*)&arm_generic_timer
-};
+    (struct dev*)&arm_generic_timer};
 
 static struct config_selected_dev selected_devs = {
     .console = (struct dev_uart*)&uart0,
     .main_timer = (struct dev_timer*)&arm_generic_timer,
-    .main_controller = (struct dev_irq_controller*)&gic
+    .main_controller = (struct dev_irq_controller*)&gic,
 };
 
 static uint16_t number_of_devices = sizeof(devs) / sizeof(struct dev*);
@@ -104,7 +98,6 @@ static uint16_t number_of_mem_regions = sizeof(mem_regs) / sizeof(struct mem_reg
 #error "Undefined target"
 
 #endif
-
 
 struct config_selected_dev* config_get_selected_dev() {
     return &selected_devs;

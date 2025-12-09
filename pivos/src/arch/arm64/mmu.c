@@ -1,7 +1,6 @@
+#include <arch/arm64/mmu.h>
 #include <kernel/arch/mmu.h>
 #include <kernel/utils.h>
-
-#include <arch/arm64/mmu.h>
 
 typedef void (*mmu_create_mem_entry)(uint64_t* mmu_table, uint32_t idx, uint8_t level, uint64_t addr, uint8_t mem_type);
 
@@ -28,7 +27,6 @@ static inline void mmu_override_mem_type(uint64_t* mmu_table, uint32_t idx, uint
 }
 
 static inline uint64_t mmu_get_addr_from_block_entry(uint64_t entry, uint8_t level) {
-    
     if (level == 1) {
         return (uint64_t)((union mmu_block_entry)entry).fields_level_1.output_address << MMU_BLOCK_ENTRY_LEVEL1_OUTPUT_ADDRESS;
     } else if (level == 2) {
@@ -59,16 +57,17 @@ static inline void mmu_dealloc_table(uint64_t* mmu_table) {
 }
 
 static void mmu_create_page_entry(uint64_t* mmu_table, uint32_t idx, uint8_t level, uint64_t addr, uint8_t mem_type) {
-    
     ASSERT(HIGH, level == 3, "Only level 3 can have page entries");
 
-    union mmu_lower_attributes lower_attributes = { .fields_stage_1 = {.AttrIndx = mem_type, .AF = 1, .AP = 0b01}};
+    union mmu_lower_attributes lower_attributes = {.fields_stage_1 = {.AttrIndx = mem_type, .AF = 1, .AP = 0b01}};
 
     union mmu_page_entry new_page_entry = {
-        .fields = {.valid = 1,
-                   .descriptor = 1,
-                   .lower_attributes = lower_attributes.bits,
-                   .output_address = addr >> MMU_PAGE_ENTRY_OUTPUT_ADDRESS}};
+        .fields = {
+            .valid = 1,
+            .descriptor = 1,
+            .lower_attributes = lower_attributes.bits,
+            .output_address = addr >> MMU_PAGE_ENTRY_OUTPUT_ADDRESS,
+        }};
 
     mmu_table[idx] = new_page_entry.bits;
 }
@@ -89,16 +88,16 @@ static void mmu_create_block_entry(uint64_t* mmu_table, uint32_t idx, uint8_t le
                 .valid = 1,
                 .descriptor = 0,
                 .lower_block_attributes = lower_attributes.bits,
-                .output_address =
-                    addr >> MMU_BLOCK_ENTRY_LEVEL1_OUTPUT_ADDRESS}};
+                .output_address = addr >> MMU_BLOCK_ENTRY_LEVEL1_OUTPUT_ADDRESS,
+            }};
     } else {
         new_block_entry = (union mmu_block_entry){
             .fields_level_2 = {
                 .valid = 1,
                 .descriptor = 0,
                 .lower_block_attributes = lower_attributes.bits,
-                .output_address =
-                    addr >> MMU_BLOCK_ENTRY_LEVEL2_OUTPUT_ADDRESS}};
+                .output_address = addr >> MMU_BLOCK_ENTRY_LEVEL2_OUTPUT_ADDRESS,
+            }};
     }
 
     mmu_table[idx] = new_block_entry.bits;
@@ -111,9 +110,7 @@ static void mmu_create_table_entry(uint64_t* mmu_table, uint32_t idx, uint8_t le
         .fields = {
             .valid = 1,
             .descriptor = 1,
-            .next_level_table_address =
-                (uint64_t)next_level_table >>
-                MMU_TABLE_ENTRY_NEXT_LEVEL_TABLE_ADDRESS,
+            .next_level_table_address = (uint64_t)next_level_table >> MMU_TABLE_ENTRY_NEXT_LEVEL_TABLE_ADDRESS,
         }};
 
     mmu_table[idx] = new_table_entry.bits;
@@ -228,7 +225,8 @@ struct mmu_entry_info mmu_find(uint64_t* mmu_table, uint8_t level, uint64_t addr
     return (struct mmu_entry_info){
         .table = temp_table,
         .idx = current_addr / mmu_size_of_level_region[current_level],
-        .level = current_level};
+        .level = current_level,
+    };
 }
 
 static void mmu_destroy_entry(uint64_t* mmu_table, uint32_t idx, uint8_t level) {
@@ -251,7 +249,8 @@ static void mmu_destroy_entry(uint64_t* mmu_table, uint32_t idx, uint8_t level) 
     table_stack[0] = (struct mmu_entry_info){
         .table = mmu_get_subtable(mmu_table, idx, level),
         .idx = 0,
-        .level = level + 1};
+        .level = level + 1,
+    };
 
     struct mmu_entry_info* current_entry = &table_stack[0];
     while (table_stack_depth > 0) {
@@ -275,7 +274,8 @@ static void mmu_destroy_entry(uint64_t* mmu_table, uint32_t idx, uint8_t level) 
                     table_stack[table_stack_depth] = (struct mmu_entry_info){
                         .table = subtable,
                         .idx = 0,
-                        .level = current_entry->level + 1};
+                        .level = current_entry->level + 1,
+                    };
 
                     table_stack_depth++;
                     current_entry->idx++;
@@ -306,7 +306,7 @@ static void mmu_map_units(uint64_t* mmu_table, uint8_t level, uint64_t addr, uin
 
     // align = page_count because if we alloc block, phys addr
     // must be also aligned to it's size
-    struct arch_mmu_space_req phys_space_request = { .page_count = pages_for_unit, .align = pages_for_unit};
+    struct arch_mmu_space_req phys_space_request = {.page_count = pages_for_unit, .align = pages_for_unit};
 
     while (count > 0) {
         struct mmu_entry_info table_data = mmu_traverse_and_alloc_tables(mmu_table, level, addr + offset, destination_level);
@@ -329,7 +329,8 @@ static void mmu_map_units(uint64_t* mmu_table, uint8_t level, uint64_t addr, uin
                     struct arch_mmu_space_req request_page = {
                         .page_count = 1,
                         .align = 1,
-                        .virt_addr = requested_addr};
+                        .virt_addr = requested_addr,
+                    };
 
                     uint64_t l3_entry = 0;
                     for (uint32_t l3_idx = 0; l3_idx < mmu_number_of_level_entries[3]; l3_idx++) {
@@ -442,16 +443,16 @@ void arch_mmu_destroy_table(void* table) {
 }
 
 void arch_mmu_change_usr_ctx(void* table, uint16_t id) {
-    uint64_t mask = (uint64_t)id << (64 - 16); // 16 - ASID SIZE
+    uint64_t mask = (uint64_t)id << (64 - 16);  // 16 - ASID SIZE
     uint64_t addr = ((uint64_t)table & ADDRESS_MASK) | mask;
 
-    __asm__ volatile (
-    "msr ttbr0_el1, %[tab]\n"
-    "tlbi vmalle1\n"
-    "dsb ish\n"
-    "isb\n"
-    :
-    : [tab] "r"(addr));
+    __asm__ volatile(
+        "msr ttbr0_el1, %[tab]\n"
+        "tlbi vmalle1\n"
+        "dsb ish\n"
+        "isb\n"
+        :
+        : [tab] "r"(addr));
 }
 
 void* arch_mmu_get_usr_ctx() {
